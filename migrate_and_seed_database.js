@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./db/gddy.sqlite');
+const db = require('better-sqlite3')('./db/gddy.sqlite', {verbose: console.log})
 const fs = require('fs');
 const sql = fs.readFileSync('./db/seed_database.sql', 'utf8');
 
