@@ -32,9 +32,9 @@ model ParentItem {
   @@map("parent_items")
 }
 
-model PurchaseOrderLineItems {
+model PurchaseOrderLineItem {
   id                Int            @id @default(autoincrement())
-  purchase_order    PurchaseOrders @relation(fields: [purchase_order_id], references: [id])
+  purchase_order    PurchaseOrder  @relation(fields: [purchase_order_id], references: [id])
   purchase_order_id Int
   item_id           Int
   quantity          Int
@@ -45,7 +45,7 @@ model PurchaseOrderLineItems {
   @@map("purchase_order_line_items")
 }
 
-model PurchaseOrders {
+model PurchaseOrder {
   id                     Int       @id @default(autoincrement())
   vendor_name            String
   order_date             DateTime
@@ -53,7 +53,7 @@ model PurchaseOrders {
   created_at             DateTime?
   updated_at             DateTime?
 
-  purchase_order_line_items PurchaseOrderLineItems[]
+  purchase_order_line_items PurchaseOrderLineItem[]
 
   @@map("purchase_orders")
 }
