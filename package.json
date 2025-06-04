@@ -12,7 +12,7 @@
     "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run db:setup",
     "start:api": "nx run api:serve:development",
     "start:client": "nx run client:serve:development",
-    "start": "npm run start:api & npm run start:client"
+    "start": "concurrently --kill-others-on-fail \"npm run start:api\" \"npm run start:client\""
   },
   "private": true,
   "dependencies": {
@@ -24,7 +24,9 @@
     "@prisma/client": "^4.16.1",
     "axios": "^1.0.0",
     "better-sqlite3": "^11.10.0",
+    "http-terminator": "^3.2.0",
     "nest-commander": "^3.15.0",
+    "nestjs-graceful-shutdown": "^1.0.3",
     "next": "14.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -55,6 +57,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.14",
     "babel-jest": "^29.4.1",
+    "concurrently": "^9.1.2",
     "cypress": "^12.11.0",
     "daisyui": "^3.0.3",
     "eslint": "^8.56.0",
