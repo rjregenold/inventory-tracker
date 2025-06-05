@@ -40,6 +40,7 @@ export class PurchaseOrderMapper {
         itemId: lineItem.itemId,
         quantity: lineItem.quantity,
         unitCost: lineItem.unitCost,
+        lineCost: lineItem.unitCost.mul(lineItem.quantity),
       })),
       totalQuantity: PurchaseOrderCalculations.totalQuantity(
         purchaseOrder.lineItems,

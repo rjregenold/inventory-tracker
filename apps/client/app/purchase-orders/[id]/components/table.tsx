@@ -12,24 +12,29 @@ export default function Table({lineItems, totalQuantity, totalCost}: Props) {
   return (
     <table className="table">
       <thead>
-        <tr>
+        <tr className="text-gray-900">
           <th></th>
-          <th>Quantity</th>
-          <th>Cost</th>
+          <th className="text-right">Unit Cost</th>
+          <th className="text-right">Quantity</th>
+          <th className="text-right">Line Cost</th>
         </tr>
       </thead>
       <tbody>
         {lineItems.map((lineItem) => (
           <tr key={lineItem.id}>
             <td></td>
-            <td>{lineItem.quantity}</td>
-            <td>{formatCurrency(lineItem.unitCost)}</td>
+            <td className="text-right">{formatCurrency(lineItem.unitCost)}</td>
+            <td className="text-right">{lineItem.quantity}</td>
+            <td className="text-right">{formatCurrency(lineItem.lineCost)}</td>
           </tr>
         ))}
         <tr>
-          <td>Totals</td>
-          <td>{totalQuantity}</td>
-          <td>{formatCurrency(totalCost)}</td>
+          <td>
+            <strong>Totals</strong>
+          </td>
+          <td></td>
+          <td className="text-right">{totalQuantity}</td>
+          <td className="text-right">{formatCurrency(totalCost)}</td>
         </tr>
       </tbody>
     </table>

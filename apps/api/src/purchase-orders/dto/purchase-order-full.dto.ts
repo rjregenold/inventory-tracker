@@ -5,6 +5,7 @@ export class PurchaseOrderLineItemDto {
   itemId: number;
   quantity: number;
   unitCost: Decimal;
+  lineCost: Decimal;
 }
 
 export class PurchaseOrderFullDto {

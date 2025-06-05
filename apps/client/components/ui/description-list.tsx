@@ -9,7 +9,7 @@ export default function DescriptionList({items}: Props) {
     <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2">
       {items.map(({term, value}, index) => (
         <Fragment key={index}>
-          <dt className="text-sm font-medium whitespace-nowrap">{term}</dt>
+          <dt className="text-sm font-medium whitespace-nowrap">{term}:</dt>
           <dd className="text-sm">{value}</dd>
         </Fragment>
       ))}

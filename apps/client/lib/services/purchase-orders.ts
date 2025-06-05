@@ -55,6 +55,7 @@ interface PurchaseOrderLineItemApi {
   itemId: number;
   quantity: number;
   unitCost: string;
+  lineCost: string;
 }
 
 export interface PurchaseOrderLineItem {
@@ -62,6 +63,7 @@ export interface PurchaseOrderLineItem {
   itemId: number;
   quantity: number;
   unitCost: Decimal;
+  lineCost: Decimal;
 }
 
 function transformLineItem(
@@ -71,6 +73,7 @@ function transformLineItem(
     return Result.ok({
       ...api,
       unitCost: new Decimal(api.unitCost),
+      lineCost: new Decimal(api.lineCost),
     });
   } catch (e) {
     console.error('failed to transform line item', e);
