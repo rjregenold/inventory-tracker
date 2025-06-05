@@ -8,25 +8,26 @@ datasource db {
 }
 
 model Item {
-  id             Int        @id @default(autoincrement())
-  parent_item    ParentItem @relation(fields: [parent_item_id], references: [id])
-  parent_item_id Int
-  name           String
-  sku            String
-  price          Decimal
-  quantity       Int
-  created_at     DateTime?
-  updated_at     DateTime?
+  id           Int        @id @default(autoincrement())
+  parentItem   ParentItem @relation(fields: [parentItemId], references: [id])
+  parentItemId Int        @map("parent_item_id")
+  name         String
+  sku          String
+  price        Decimal
+  quantity     Int
+  created_at   DateTime?
+  updated_at   DateTime?
+
   purchaseOrderLineItems PurchaseOrderLineItem[]
 
   @@map("items")
 }
 
 model ParentItem {
-  id         Int       @id @default(autoincrement())
-  name       String
-  created_at DateTime?
-  updated_at DateTime?
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @map("updated_at")
 
   items Item[]
 
@@ -49,9 +50,9 @@ model PurchaseOrderLineItem {
 
 model PurchaseOrder {
   id                   Int       @id @default(autoincrement())
-  vendorName           String @map("vendor_name")
-  orderDate            DateTime @map("order_date")
-  expectedDeliveryDate DateTime @map("expected_delivery_date")
+  vendorName           String    @map("vendor_name")
+  orderDate            DateTime  @map("order_date")
+  expectedDeliveryDate DateTime  @map("expected_delivery_date")
   createdAt            DateTime? @map("created_at")
   updatedAt            DateTime? @map("updated_at")
 

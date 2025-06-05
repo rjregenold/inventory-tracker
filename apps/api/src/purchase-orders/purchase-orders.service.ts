@@ -32,7 +32,7 @@ export class PurchaseOrdersService {
           include: {
             item: {
               include: {
-                parent_item: true,
+                parentItem: true,
               },
             },
           },

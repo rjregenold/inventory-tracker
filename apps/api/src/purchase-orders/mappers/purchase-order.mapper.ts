@@ -14,7 +14,7 @@ type PurchaseOrderWithDetails = Prisma.PurchaseOrderGetPayload<{
       include: {
         item: {
           include: {
-            parent_item: true;
+            parentItem: true;
           };
         };
       };
@@ -54,7 +54,7 @@ export class PurchaseOrderMapper {
         id: lineItem.id,
         itemId: lineItem.itemId,
         name: lineItem.item.name,
-        parentName: lineItem.item.parent_item.name,
+        parentName: lineItem.item.parentItem.name,
         quantity: lineItem.quantity,
         unitCost: lineItem.unitCost,
         lineCost: lineItem.unitCost.mul(lineItem.quantity),
