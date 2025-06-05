@@ -1,4 +1,4 @@
-import {Controller, Get, Param} from '@nestjs/common';
+import {Controller, Get, NotFoundException, Param} from '@nestjs/common';
 import {PurchaseOrdersService} from './purchase-orders.service';
 
 @Controller('purchase-orders')
@@ -11,7 +11,11 @@ export class PurchaseOrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.purchaseOrdersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const purchaseOrder = await this.purchaseOrdersService.findOne(+id);
+    if (!purchaseOrder) {
+      throw new NotFoundException();
+    }
+    return purchaseOrder;
   }
 }

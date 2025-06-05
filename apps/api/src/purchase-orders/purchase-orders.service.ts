@@ -1,8 +1,8 @@
 import {Injectable} from '@nestjs/common';
-import {PurchaseOrder} from '@prisma/client';
-import {Decimal} from 'decimal.js';
 import {PrismaService} from '../prisma.service';
 import {PurchaseOrderSummaryDto} from './dto/purchase-order-summary.dto';
+import {PurchaseOrderFullDto} from './dto/purchase-order-full.dto';
+import {PurchaseOrderMapper} from './mappers/purchase-order.mapper';
 
 @Injectable()
 export class PurchaseOrdersService {
@@ -11,33 +11,28 @@ export class PurchaseOrdersService {
   async findAll(): Promise<PurchaseOrderSummaryDto[]> {
     const purchaseOrders = await this.prisma.purchaseOrder.findMany({
       include: {
-        purchase_order_line_items: {
+        lineItems: {
           select: {
             quantity: true,
-            unit_cost: true,
+            unitCost: true,
           },
         },
       },
     });
 
-    return purchaseOrders.map((purchaseOrder) => ({
-      id: purchaseOrder.id,
-      vendorName: purchaseOrder.vendor_name,
-      orderDate: purchaseOrder.order_date,
-      expectedDeliveryDate: purchaseOrder.expected_delivery_date,
-      totalQuantity: purchaseOrder.purchase_order_line_items.reduce(
-        (acc, item) => acc + item.quantity,
-        0,
-      ),
-      // we keep totalCost as a Decimal to avoid floating point errors
-      totalCost: purchaseOrder.purchase_order_line_items.reduce(
-        (acc, item) => acc.add(item.unit_cost.mul(item.quantity)),
-        new Decimal(0),
-      ),
-    }));
+    return purchaseOrders.map(PurchaseOrderMapper.toSummaryDto);
   }
 
-  findOne(id: number): Promise<PurchaseOrder | null> {
-    return this.prisma.purchaseOrder.findUnique({where: {id: id}});
+  async findOne(id: number): Promise<PurchaseOrderFullDto | null> {
+    const purchaseOrder = await this.prisma.purchaseOrder.findUnique({
+      where: {id},
+      include: {lineItems: true},
+    });
+
+    if (!purchaseOrder) {
+      return null;
+    }
+
+    return PurchaseOrderMapper.toFullDto(purchaseOrder);
   }
 }

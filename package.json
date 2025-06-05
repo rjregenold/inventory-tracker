@@ -10,6 +10,9 @@
     "install:nx": "npm install --global nx@latest",
     "db:setup": "node migrate_and_seed_database.js",
     "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run db:setup",
+    "test": "NODE_ENV=test nx run-many --target=test --all",
+    "test:api": "NODE_ENV=test nx test api",
+    "test:client": "NODE_ENV=test nx test client",
     "start:api": "nx run api:serve:development",
     "start:client": "nx run client:serve:development",
     "start": "concurrently --kill-others-on-fail \"npm run start:api\" \"npm run start:client\""
