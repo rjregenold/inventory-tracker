@@ -53,6 +53,8 @@ function transformSummary(
 interface PurchaseOrderLineItemApi {
   id: number;
   itemId: number;
+  name: string;
+  parentName: string;
   quantity: number;
   unitCost: string;
   lineCost: string;
@@ -61,6 +63,8 @@ interface PurchaseOrderLineItemApi {
 export interface PurchaseOrderLineItem {
   id: number;
   itemId: number;
+  name: string;
+  parentName: string;
   quantity: number;
   unitCost: Decimal;
   lineCost: Decimal;

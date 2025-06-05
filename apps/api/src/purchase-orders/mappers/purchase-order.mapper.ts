@@ -1,11 +1,26 @@
-import {PurchaseOrder, PurchaseOrderLineItem} from '@prisma/client';
+import {
+  Item,
+  Prisma,
+  PurchaseOrder,
+  PurchaseOrderLineItem,
+} from '@prisma/client';
 import {PurchaseOrderSummaryDto} from '../dto/purchase-order-summary.dto';
 import {PurchaseOrderCalculations} from '../utils/purchase-order-calculations';
 import {PurchaseOrderFullDto} from '../dto/purchase-order-full.dto';
 
-type PurchaseOrderWithLineItems = PurchaseOrder & {
-  lineItems: PurchaseOrderLineItem[];
-};
+type PurchaseOrderWithDetails = Prisma.PurchaseOrderGetPayload<{
+  include: {
+    lineItems: {
+      include: {
+        item: {
+          include: {
+            parent_item: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 
 type PurchaseOrderWithLineItemsSummary = PurchaseOrder & {
   lineItems: Pick<PurchaseOrderLineItem, 'quantity' | 'unitCost'>[];
@@ -28,7 +43,7 @@ export class PurchaseOrderMapper {
   }
 
   static toFullDto(
-    purchaseOrder: PurchaseOrderWithLineItems,
+    purchaseOrder: PurchaseOrderWithDetails,
   ): PurchaseOrderFullDto {
     return {
       id: purchaseOrder.id,
@@ -38,6 +53,8 @@ export class PurchaseOrderMapper {
       lineItems: purchaseOrder.lineItems.map((lineItem) => ({
         id: lineItem.id,
         itemId: lineItem.itemId,
+        name: lineItem.item.name,
+        parentName: lineItem.item.parent_item.name,
         quantity: lineItem.quantity,
         unitCost: lineItem.unitCost,
         lineCost: lineItem.unitCost.mul(lineItem.quantity),

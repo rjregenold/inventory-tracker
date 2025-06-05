@@ -27,7 +27,17 @@ export class PurchaseOrdersService {
   async findOne(id: number): Promise<PurchaseOrderFullDto | null> {
     const purchaseOrder = await this.prisma.purchaseOrder.findUnique({
       where: {id},
-      include: {lineItems: true},
+      include: {
+        lineItems: {
+          include: {
+            item: {
+              include: {
+                parent_item: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!purchaseOrder) {

@@ -38,7 +38,7 @@ export default function Detail({purchaseOrder}: Props) {
           />
         </div>
       </div>
-      <div className="card bg-gray-400 text-gray-900">
+      <div className="card bg-gray-400 text-gray-900 mb-4">
         <div className="card-body">
           <div className="card-title">Line Items</div>
           <Table

@@ -17,6 +17,7 @@ model Item {
   quantity       Int
   created_at     DateTime?
   updated_at     DateTime?
+  purchaseOrderLineItems PurchaseOrderLineItem[]
 
   @@map("items")
 }
@@ -33,14 +34,15 @@ model ParentItem {
 }
 
 model PurchaseOrderLineItem {
-  id              Int            @id @default(autoincrement())
-  purchaseOrder   PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id])
-  purchaseOrderId Int @map("purchase_order_id")
-  itemId          Int @map("item_id")
+  id              Int           @id @default(autoincrement())
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  purchaseOrderId Int           @map("purchase_order_id")
+  item            Item          @relation(fields: [itemId], references: [id])
+  itemId          Int           @map("item_id")
   quantity        Int
-  unitCost        Decimal @map("unit_cost")
-  createdAt       DateTime? @map("created_at")
-  updatedAt       DateTime? @map("updated_at")
+  unitCost        Decimal       @map("unit_cost")
+  createdAt       DateTime?     @map("created_at")
+  updatedAt       DateTime?     @map("updated_at")
 
   @@map("purchase_order_line_items")
 }
