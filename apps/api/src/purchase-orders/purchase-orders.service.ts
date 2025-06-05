@@ -10,6 +10,7 @@ export class PurchaseOrdersService {
 
   async findAll(): Promise<PurchaseOrderSummaryDto[]> {
     const purchaseOrders = await this.prisma.purchaseOrder.findMany({
+      orderBy: {expectedDeliveryDate: 'asc'},
       include: {
         lineItems: {
           select: {

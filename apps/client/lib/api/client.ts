@@ -1,4 +1,4 @@
-import {err, ok, Result} from '../types/result';
+import {Result} from '../types/result';
 
 export interface ApiError {
   message: string;
@@ -39,7 +39,7 @@ export class ApiClient {
           errorData = {message: res.statusText};
         }
 
-        return err({
+        return Result.err({
           message: errorData.message || `HTTP ${res.status}`,
           status: res.status,
           data: errorData,
@@ -47,13 +47,13 @@ export class ApiClient {
       }
 
       if (res.status === 204) {
-        return ok({} as T);
+        return Result.ok({} as T);
       }
 
-      return ok(await res.json());
+      return Result.ok(await res.json());
     } catch (e) {
       console.error('request failed', url, e);
-      return err({
+      return Result.err({
         message: 'Network error or server unavailable',
         status: 0,
         data: {originalError: e},
