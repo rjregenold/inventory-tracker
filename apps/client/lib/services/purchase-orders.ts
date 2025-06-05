@@ -1,9 +1,18 @@
 import {Decimal} from 'decimal.js';
 import {inventoryApi} from '../api/inventory';
 import {Result} from '../types/result';
+import {ApiError} from '../api/client';
 
 type PurchaseOrderId = Brand<number, 'PurchaseOrderId'>;
 const PurchaseOrderId = (id: number): PurchaseOrderId => id as PurchaseOrderId;
+export function safePurchaseOrderId(
+  id: string,
+): Result<PurchaseOrderId, string> {
+  const idNum = parseInt(id);
+  return Number.isNaN(idNum)
+    ? Result.err('invalid purchase order id')
+    : Result.ok(PurchaseOrderId(idNum));
+}
 const unwrapPurchaseOrderId = (id: PurchaseOrderId): number => id as number;
 
 interface PurchaseOrderSummaryApi {
@@ -41,11 +50,42 @@ function transformSummary(
   }
 }
 
+interface PurchaseOrderLineItemApi {
+  id: number;
+  itemId: number;
+  quantity: number;
+  unitCost: string;
+}
+
 export interface PurchaseOrderLineItem {
   id: number;
   itemId: number;
   quantity: number;
   unitCost: Decimal;
+}
+
+function transformLineItem(
+  api: PurchaseOrderLineItemApi,
+): Result<PurchaseOrderLineItem, string> {
+  try {
+    return Result.ok({
+      ...api,
+      unitCost: new Decimal(api.unitCost),
+    });
+  } catch (e) {
+    console.error('failed to transform line item', e);
+    return Result.err('invalid line item');
+  }
+}
+
+interface PurchaseOrderFullApi {
+  id: PurchaseOrderId;
+  vendorName: string;
+  orderDate: string;
+  expectedDeliveryDate: string;
+  lineItems: PurchaseOrderLineItemApi[];
+  totalQuantity: number;
+  totalCost: string;
 }
 
 export interface PurchaseOrderFull {
@@ -58,6 +98,26 @@ export interface PurchaseOrderFull {
   totalCost: Decimal;
 }
 
+function transformFull(
+  api: PurchaseOrderFullApi,
+): Result<PurchaseOrderFull, string> {
+  try {
+    return Result.map(
+      Result.collect(api.lineItems.map(transformLineItem)),
+      (lineItems) => ({
+        ...api,
+        orderDate: new Date(api.orderDate),
+        expectedDeliveryDate: new Date(api.expectedDeliveryDate),
+        lineItems,
+        totalCost: new Decimal(api.totalCost),
+      }),
+    );
+  } catch (e) {
+    console.error('failed to transform purchase order', e);
+    return Result.err('invalid purchase order data');
+  }
+}
+
 export class PurchaseOrderService {
   static async findAll(): Promise<Result<PurchaseOrderSummary[], string>> {
     const res =
@@ -65,13 +125,14 @@ export class PurchaseOrderService {
     return Result.biFlatMap(
       res,
       (xs) => Result.collect(xs.map(transformSummary)),
-      (e) => `API Error: ${e.message}`,
+      ApiError.toString,
     );
   }
 
   static async findOne(id: PurchaseOrderId) {
-    return await inventoryApi.get<PurchaseOrderFull>(
+    const res = await inventoryApi.get<PurchaseOrderFullApi>(
       `/purchase-orders/${unwrapPurchaseOrderId(id)}`,
     );
+    return Result.biFlatMap(res, transformFull, ApiError.toString);
   }
 }

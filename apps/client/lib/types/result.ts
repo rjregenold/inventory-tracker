@@ -43,6 +43,16 @@ export namespace Result {
     return res.success ? ok(fn(res.data)) : res;
   }
 
+  // executes the given fn for the success variant and the
+  // given errFn for the error variant
+  export function fold<T, E, U>(
+    res: Result<T, E>,
+    fn: (value: T) => U,
+    errFn: (error: E) => U,
+  ): U {
+    return res.success ? fn(res.data) : errFn(res.error);
+  }
+
   // executes a function that returns a result on the success variant
   export function flatMap<T, U, E>(
     res: Result<T, E>,

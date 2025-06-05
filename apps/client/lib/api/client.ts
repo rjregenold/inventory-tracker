@@ -6,6 +6,12 @@ export interface ApiError {
   data?: any;
 }
 
+export class ApiError {
+  static toString(err: ApiError): string {
+    return `API Error: ${err.message}`;
+  }
+}
+
 export class ApiClient {
   private baseUrl: string;
   private defaultHeaders: HeadersInit;
