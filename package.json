@@ -15,7 +15,7 @@
     "test:client": "NODE_ENV=test nx test client",
     "start:api": "nx run api:serve:development",
     "start:client": "nx run client:serve:development",
-    "start": "concurrently --kill-others-on-fail \"npm run start:api\" \"npm run start:client\""
+    "start": "concurrently \"npm run start:api\" \"npm run start:client\""
   },
   "private": true,
   "dependencies": {
