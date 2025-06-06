@@ -11,7 +11,7 @@ export default function Error({error, reset}: ErrorProps) {
   return (
     <>
       <div>
-        <strong>Error:</strong> {error.message}
+        <strong>An error occurred:</strong> {error.message}
       </div>
       <button onClick={reset} className="flex align-center btn">
         <IconRefresh />
