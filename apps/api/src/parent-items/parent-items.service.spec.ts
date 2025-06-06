@@ -13,7 +13,7 @@ describe('ParentItemsService', () => {
     service = module.get<ParentItemsService>(ParentItemsService);
   });
 
-  it('should be defined', async () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });
