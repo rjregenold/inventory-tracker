@@ -125,8 +125,10 @@ function transformFull(
   }
 }
 
-export class PurchaseOrderService {
-  static async findAll(): Promise<Result<PurchaseOrderSummary[], string>> {
+export namespace PurchaseOrderService {
+  export async function findAll(): Promise<
+    Result<PurchaseOrderSummary[], string>
+  > {
     const res =
       await inventoryApi.get<PurchaseOrderSummaryApi[]>('/purchase-orders');
     return Result.biFlatMap(
@@ -136,7 +138,7 @@ export class PurchaseOrderService {
     );
   }
 
-  static async findOne(id: PurchaseOrderId) {
+  export async function findOne(id: PurchaseOrderId) {
     const res = await inventoryApi.get<PurchaseOrderFullApi>(
       `/purchase-orders/${unwrapPurchaseOrderId(id)}`,
     );
