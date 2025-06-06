@@ -1,8 +1,10 @@
 import {ReactNode} from 'react';
-import {PurchaseOrderSummary} from '@/lib/services/purchase-orders';
+import {PurchaseOrderSummary} from '@/lib/services/purchase-orders.service';
 import {formatCurrency} from '@/lib/utils/currency';
 import {formatDate} from '@/lib/utils/date';
 import Link from 'next/link';
+import TrackButton from './track-button';
+import ContactButton from './contact-button';
 
 interface Props {
   purchaseOrder: PurchaseOrderSummary;
@@ -46,8 +48,8 @@ export default function Card({purchaseOrder}: Props) {
           <div>Shipping from {purchaseOrder.vendorName}</div>
         </div>
         <div className="flex flex-col gap-2">
-          <button className="btn btn-block">Track Order</button>
-          <button className="btn btn-neutral btn-block">Contact Vendor</button>
+          <TrackButton vendorName={purchaseOrder.vendorName} />
+          <ContactButton vendorName={purchaseOrder.vendorName} />
         </div>
       </div>
     </div>
