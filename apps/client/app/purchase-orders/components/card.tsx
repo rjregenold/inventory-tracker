@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {differenceInDays} from 'date-fns';
 import {PurchaseOrderSummary} from '@/lib/services/purchase-orders.service';
 import {formatCurrency} from '@/lib/utils/currency';
 import {formatDate} from '@/lib/utils/date';
@@ -10,6 +11,19 @@ interface Props {
   purchaseOrder: PurchaseOrderSummary;
 }
 
+enum Urgency {
+  High,
+  Medium,
+  Low,
+}
+
+function getUrgency(deliveryDate: Date, now: Date): Urgency {
+  const daysUntil = differenceInDays(deliveryDate, now);
+  if (daysUntil < 0) return Urgency.High;
+  if (daysUntil < 3) return Urgency.Medium;
+  return Urgency.Low;
+}
+
 export default function Card({purchaseOrder}: Props) {
   const renderMeta = (name: string, value: ReactNode) => (
     <div>
@@ -17,6 +31,8 @@ export default function Card({purchaseOrder}: Props) {
       <div>{value}</div>
     </div>
   );
+
+  const urgency = getUrgency(purchaseOrder.expectedDeliveryDate, new Date());
 
   return (
     <div className="my-8 shadow-md rounded-md">
@@ -42,9 +58,17 @@ export default function Card({purchaseOrder}: Props) {
       </div>
       <div className="bg-gray-400 text-gray-900 p-4 flex rounded-b-md">
         <div className="flex-auto">
-          <h3 className="text-xl font-bold">
-            Expected {formatDate(purchaseOrder.expectedDeliveryDate)}
-          </h3>
+          <div className="flex items-center">
+            <h3 className="text-xl font-bold mr-1">
+              Expected {formatDate(purchaseOrder.expectedDeliveryDate)}
+            </h3>
+            {urgency === Urgency.High && (
+              <div className="badge badge-sm badge-error">overdue</div>
+            )}
+            {urgency === Urgency.Medium && (
+              <div className="badge badge-sm badge-warning">arriving soon</div>
+            )}
+          </div>
           <div>Shipping from {purchaseOrder.vendorName}</div>
         </div>
         <div className="flex flex-col gap-2">
