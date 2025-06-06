@@ -1,12 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ParentItemsService } from './parent-items.service';
+import {ParentItemsService} from './parent-items.service';
+import {PrismaService} from '../prisma.service';
+import {createTestModuleBuilder} from '../../test/helpers/create-test-module';
 
 describe('ParentItemsService', () => {
   let service: ParentItemsService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [ParentItemsService],
+    const module = await createTestModuleBuilder({
+      providers: [ParentItemsService, PrismaService],
     }).compile();
 
     service = module.get<ParentItemsService>(ParentItemsService);

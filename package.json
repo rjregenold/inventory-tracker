@@ -8,10 +8,14 @@
   "license": "MIT",
   "scripts": {
     "install:nx": "npm install --global nx@latest",
-    "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma",
+    "db:setup": "node migrate_and_seed_database.js",
+    "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run db:setup",
+    "test": "NODE_ENV=test nx run-many --target=test --all",
+    "test:api": "NODE_ENV=test nx test api",
+    "test:client": "NODE_ENV=test nx test client",
     "start:api": "nx run api:serve:development",
     "start:client": "nx run client:serve:development",
-    "start": "npm run start:api & npm run start:client"
+    "start": "concurrently \"npm run start:api\" \"npm run start:client\""
   },
   "private": true,
   "dependencies": {
@@ -22,13 +26,16 @@
     "@nestjs/platform-express": "^10.4.4",
     "@prisma/client": "^4.16.1",
     "axios": "^1.0.0",
+    "better-sqlite3": "^11.10.0",
+    "date-fns": "^4.1.0",
+    "http-terminator": "^3.2.0",
     "nest-commander": "^3.15.0",
+    "nestjs-graceful-shutdown": "^1.0.3",
     "next": "14.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
-    "sqlite3": "^5.1.6",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
@@ -54,6 +61,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "autoprefixer": "^10.4.14",
     "babel-jest": "^29.4.1",
+    "concurrently": "^9.1.2",
     "cypress": "^12.11.0",
     "daisyui": "^3.0.3",
     "eslint": "^8.56.0",
