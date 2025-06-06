@@ -2,7 +2,7 @@ import Error from '@/components/common/error';
 import {
   safePurchaseOrderId,
   PurchaseOrderService,
-} from '@/lib/services/purchase-orders';
+} from '@/lib/services/purchase-orders.service';
 import {Result} from '@/lib/types/result';
 import {notFound} from 'next/navigation';
 import Detail from './components/detail';

@@ -1,5 +1,5 @@
 import {Result} from '@/lib/types/result';
-import {PurchaseOrderService} from '@/lib/services/purchase-orders';
+import {PurchaseOrderService} from '@/lib/services/purchase-orders.service';
 import Card from './components/card';
 import Error from '@/components/common/error';
 
