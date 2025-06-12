@@ -84,3 +84,29 @@ Here is the schema we will use for this exercise.
 In the technical interview process we will makes some changes to this code expoloring concepts such as ERP and Inventory. More specific requirements will be shared during the collaboration session.
 
 We are looking forward to our pairing session soon!
+
+## Podman Compose
+
+We are using [Podman](https://podman.io/) and [Podman Compose](https://docs.podman.io/en/stable/markdown/podman-compose.1.html) to allow us to run services locally.
+
+Make sure you have installed the latest version of each.
+
+### Starting Services
+
+To start the services, execute the following command:
+
+```bash
+$ podman-compose up
+```
+
+This command will bring up all the services defined in `podman-compose.yml`. You can execute commands in any of the services defined like this:
+
+```bash
+$ podman-compose exec [service-name] [command]
+```
+
+To get a bash shell in the kafka container, you could do this:
+
+```bash
+$ podman-compose exec kafka /bin/bash
+```
