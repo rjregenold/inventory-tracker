@@ -53,8 +53,9 @@ It's likely we won't complete every requirement, but let's get as far as we can 
 - Nest comes with [generators](https://docs.nestjs.com/recipes/crud-generator) to help you scaffold out your application. You can run `nx g @nx/nest:resource <name>` to generate a resource much of the boilerplate you need for purchase orders.
 
 ### To Start Exercise
-Run the following commands to get the project going. `install:nx` is a one-time command that is only needed if you don't have NX installed yet.
-```
+Run the following commands to get the project going. Ensure you read the Podman Compose section below and have the containers running before continuing. `install:nx` is a one-time command that is only needed if you don't have NX installed yet.
+```bash
+podman-compose up -d
 npm run install:nx
 npm run setup
 npm run start
@@ -62,15 +63,17 @@ npm run start
 The application will be running at http://localhost:4200
 
 #### Additional details
-When coding it may be easier to run the API and client separately. You can start them independently with the following commands:
+When coding it may be easier to run the API, client, or stream consumer separately. You can start them independently with the following commands:
 ```
 npm run start:api
 npm run start:client
+npm run start:consumer
 ```
 
 Once both servers are running, you can access:
 - The API at: http://localhost:3100
 - The client application at: http://localhost:4200
+- The Kafka UI at: http://localhost:8082
 
 ### Schema
 Here is the schema we will use for this exercise.
