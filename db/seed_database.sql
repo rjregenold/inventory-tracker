@@ -1,71 +1,136 @@
-DROP TABLE IF EXISTS parent_items;
-CREATE TABLE parent_items
-(
-  `id`         INTEGER PRIMARY KEY AUTOINCREMENT,
-  `name`       varchar(255) NOT NULL,
-  `created_at` TIMESTAMP NULL,
-  `updated_at` TIMESTAMP NULL
+-- CreateTable
+CREATE TABLE "roles" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-INSERT INTO parent_items (`id`, `name`)
-VALUES (1, 'T-shirt'),
-       (2, 'Pants');
 
-DROP TABLE IF EXISTS items;
-CREATE TABLE items
-(
-  `id`             INTEGER PRIMARY KEY AUTOINCREMENT,
-  `parent_item_id` INTEGER       NOT NULL,
-  `name`           varchar(255)  NOT NULL,
-  `sku`            varchar(255)  NOT NULL,
-  `price`          DECIMAL(6, 2) NOT NULL,
-  `quantity`       INTEGER       NOT NULL,
-  `created_at`     TIMESTAMP NULL,
-  `updated_at`     TIMESTAMP NULL
+-- CreateTable
+CREATE TABLE "permissions" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "action" TEXT NOT NULL,
+    "resource" TEXT NOT NULL,
+    "role_id" TEXT NOT NULL,
+    CONSTRAINT "permissions_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
-INSERT INTO items (`parent_item_id`, `name`, `sku`, `price`, `quantity`)
-VALUES (1, 'Red shirt', 'sh-1', 10.00, 10),
-       (1, 'Blue shirt', 'sh-2', 10.00, 10),
-       (1, 'Green shirt', 'sh-3', 10.00, 10),
-       (2, 'Red pants', 'pa-1', 20.00, 10),
-       (2, 'Blue pants', 'pa-2', 20.00, 10),
-       (2, 'Green pants', 'pa-3', 20.00, 10);
 
-DROP TABLE IF EXISTS purchase_orders;
-CREATE TABLE purchase_orders
-(
-  `id`                     INTEGER PRIMARY KEY AUTOINCREMENT,
-  `vendor_name`            VARCHAR(255) NOT NULL,
-  `order_date`             DATETIME NOT NULL,
-  `expected_delivery_date` DATETIME NOT NULL,
-  `created_at`             TIMESTAMP NULL,
-  `updated_at`             TIMESTAMP NULL
+-- CreateTable
+CREATE TABLE "user_roles" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "user_id" TEXT NOT NULL,
+    "role_id" TEXT NOT NULL,
+    CONSTRAINT "user_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "user_roles_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
-INSERT INTO purchase_orders (`vendor_name`, `order_date`, `expected_delivery_date`)
-VALUES ('Levis', '2023-01-01 12:00:00', '2023-03-10 12:00:00'),
-       ('Bonobos', '2023-02-01 12:00:00', '2023-04-10 12:00:00'),
-       ('Scotch and Soda', '2023-03-01 12:00:00', '2023-05-10 12:00:00');
 
-DROP TABLE IF EXISTS purchase_order_line_items;
-CREATE TABLE purchase_order_line_items
-(
-  `id`                INTEGER PRIMARY KEY AUTOINCREMENT,
-  `purchase_order_id` INT            NOT NULL,
-  `item_id`           INT            NOT NULL,
-  `quantity`          INT            NOT NULL,
-  `unit_cost`         DECIMAL(10, 2) NOT NULL,
-  `created_at`        TIMESTAMP NULL,
-  `updated_at`        TIMESTAMP NULL
+-- CreateTable
+CREATE TABLE "accounts" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "user_id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "provider_account_id" TEXT NOT NULL,
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
+    CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-INSERT INTO purchase_order_line_items (`purchase_order_id`, `item_id`, `quantity`, `unit_cost`)
-VALUES (1, 1, 10, 10.00),
-       (1, 2, 10, 10.00),
-       (1, 3, 10, 10.00),
-       (2, 4, 10, 20.00),
-       (2, 5, 10, 20.00),
-       (2, 6, 10, 20.00),
-       (3, 1, 10, 10.00),
-       (3, 2, 10, 10.00),
-       (3, 3, 10, 10.00),
-       (3, 4, 10, 20.00),
-       (3, 5, 10, 20.00),
-       (3, 6, 10, 20.00);
+
+-- CreateTable
+CREATE TABLE "sessions" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "session_token" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "expires" DATETIME NOT NULL,
+    CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "verification_tokens" (
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expires" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "email" TEXT NOT NULL,
+    "name" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME
+);
+
+-- CreateTable
+CREATE TABLE "items" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "parent_item_id" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "sku" TEXT NOT NULL,
+    "price" DECIMAL NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME,
+    CONSTRAINT "items_parent_item_id_fkey" FOREIGN KEY ("parent_item_id") REFERENCES "parent_items" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "parent_items" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME
+);
+
+-- CreateTable
+CREATE TABLE "purchase_order_line_items" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "purchase_order_id" INTEGER NOT NULL,
+    "item_id" INTEGER NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "unit_cost" DECIMAL NOT NULL,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME,
+    CONSTRAINT "purchase_order_line_items_purchase_order_id_fkey" FOREIGN KEY ("purchase_order_id") REFERENCES "purchase_orders" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "purchase_order_line_items_item_id_fkey" FOREIGN KEY ("item_id") REFERENCES "items" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "purchase_orders" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "vendor_name" TEXT NOT NULL,
+    "order_date" DATETIME NOT NULL,
+    "expected_delivery_date" DATETIME NOT NULL,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "permissions_action_resource_role_id_key" ON "permissions"("action", "resource", "role_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_roles_user_id_role_id_key" ON "user_roles"("user_id", "role_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sessions_session_token_key" ON "sessions"("session_token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "verification_tokens_token_key" ON "verification_tokens"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens"("identifier", "token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+

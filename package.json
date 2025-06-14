@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "install:nx": "npm install --global nx@latest",
-    "setup:db": "node migrate_and_seed_database.js",
+    "setup:db": "tsx scripts/migrate_and_seed_database.js && DATABASE_URL=file:../../../db/gddy.sqlite npx prisma db seed",
     "setup:stream": "tsx scripts/setup-kafka-topics.ts",
     "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run setup:db && npm run setup:stream",
     "test": "NODE_ENV=test nx run-many --target=test --all",
@@ -18,6 +18,9 @@
     "start:client": "nx run client:serve:development",
     "start:consumer": "nx run stream-consumer:serve:development",
     "start": "concurrently \"npm run start:api\" \"npm run start:client\" \"npm run start:consumer\""
+  },
+  "prisma": {
+    "seed": "tsx apps/api/prisma/seed.ts"
   },
   "private": true,
   "dependencies": {
