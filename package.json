@@ -30,6 +30,8 @@
     "@prisma/client": "^4.16.1",
     "axios": "^1.6.0",
     "better-sqlite3": "^11.10.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "date-fns": "^4.1.0",
     "http-terminator": "^3.2.0",
     "kafkajs": "^2.2.4",

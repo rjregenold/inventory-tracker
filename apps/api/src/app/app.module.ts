@@ -5,12 +5,14 @@ import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {ParentItemsModule} from '../parent-items/parent-items.module';
 import {PurchaseOrdersModule} from '../purchase-orders/purchase-orders.module';
+import {VendorsModule} from '../vendors/vendors.module';
 
 @Module({
   imports: [
     GracefulShutdownModule.forRoot(),
     ParentItemsModule,
     PurchaseOrdersModule,
+    VendorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
