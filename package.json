@@ -8,9 +8,9 @@
   "license": "MIT",
   "scripts": {
     "install:nx": "npm install --global nx@latest",
-    "db:setup": "node migrate_and_seed_database.js",
-    "stream:setup": "tsx scripts/setup-kafka-topics.ts",
-    "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run db:setup && npm run stream:setup",
+    "setup:db": "node migrate_and_seed_database.js",
+    "setup:stream": "tsx scripts/setup-kafka-topics.ts",
+    "setup": "npm install && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run setup:db && npm run setup:stream",
     "test": "NODE_ENV=test nx run-many --target=test --all",
     "test:api": "NODE_ENV=test nx test api",
     "test:client": "NODE_ENV=test nx test client",

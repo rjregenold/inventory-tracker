@@ -59,8 +59,8 @@ export class EventPublisher {
       event.data !== null
     ) {
       const data = event.data as any;
-      if (data.productId) return data.productId;
-      if (data.purchaseOrderId) return data.purchaseOrderId;
+      if (data.productId) return data.productId.toString();
+      if (data.purchaseOrderId) return data.purchaseOrderId.toString();
     }
     return event.eventId;
   }

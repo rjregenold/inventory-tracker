@@ -49,6 +49,7 @@ export class PurchaseOrderMapper {
         id: lineItem.id,
         itemId: lineItem.itemId,
         name: lineItem.item.name,
+        sku: lineItem.item.sku,
         parentName: lineItem.item.parentItem.name,
         quantity: lineItem.quantity,
         unitCost: lineItem.unitCost,

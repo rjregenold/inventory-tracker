@@ -6,6 +6,7 @@ import {AppService} from './app.service';
 import {ParentItemsModule} from '../parent-items/parent-items.module';
 import {PurchaseOrdersModule} from '../purchase-orders/purchase-orders.module';
 import {VendorsModule} from '../vendors/vendors.module';
+import {EventsModule} from '../events/events.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import {VendorsModule} from '../vendors/vendors.module';
     ParentItemsModule,
     PurchaseOrdersModule,
     VendorsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

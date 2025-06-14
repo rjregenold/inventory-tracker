@@ -1,4 +1,5 @@
 import {BaseEvent} from './base';
+import {Decimal} from 'decimal.js';
 
 export interface PurchaseOrderCreated extends BaseEvent {
   eventType: 'procurement.purchase-order-created';
@@ -10,12 +11,12 @@ export interface PurchaseOrderCreated extends BaseEvent {
       itemId: number;
       sku: string;
       quantity: number;
-      unitCost: string;
+      unitCost: Decimal;
     }>;
     totalQuantity: number;
-    totalCost: string;
-    orderDate: string;
-    expectedDeliveryDate: string;
+    totalCost: Decimal;
+    orderedDate: Date;
+    expectedDeliveryDate: Date;
   };
 }
 

@@ -6,12 +6,17 @@ import {PurchaseOrderFullDto} from './dto/purchase-order-full.dto';
 import {PurchaseOrderMapper} from './mappers/purchase-order.mapper';
 import {CreatePurchaseOrderDto} from './create-purchase-order-dto';
 import {VendorsService} from '../vendors/vendors.service';
+import {
+  EventPublisher,
+  PurchaseOrderCreated,
+} from '@gddy-coding-exercise/shared-events';
 
 @Injectable()
 export class PurchaseOrdersService {
   constructor(
     private prisma: PrismaService,
     private vendorsService: VendorsService,
+    private eventPublisher: EventPublisher,
   ) {}
 
   async findAll(): Promise<PurchaseOrderSummaryDto[]> {
@@ -100,6 +105,26 @@ export class PurchaseOrdersService {
       },
     });
 
-    return PurchaseOrderMapper.toFullDto(purchaseOrder);
+    const fullDto = PurchaseOrderMapper.toFullDto(purchaseOrder);
+    this.eventPublisher.publish<PurchaseOrderCreated>({
+      eventType: 'procurement.purchase-order-created',
+      data: {
+        purchaseOrderId: fullDto.id,
+        vendorName: fullDto.vendorName,
+        items: fullDto.lineItems.map((item) => ({
+          lineItemId: item.id,
+          itemId: item.itemId,
+          sku: item.sku,
+          quantity: item.quantity,
+          unitCost: item.unitCost,
+        })),
+        totalQuantity: fullDto.totalQuantity,
+        totalCost: fullDto.totalCost,
+        orderedDate: fullDto.orderDate,
+        expectedDeliveryDate: fullDto.expectedDeliveryDate,
+      },
+    });
+
+    return fullDto;
   }
 }
