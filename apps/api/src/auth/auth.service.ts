@@ -50,6 +50,7 @@ export class AuthService {
         email: identifier,
         code: token,
         expires: expires,
+        createdAt: now,
       },
     });
 

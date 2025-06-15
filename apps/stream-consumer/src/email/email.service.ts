@@ -17,15 +17,15 @@ export class EmailService {
     });
   }
 
-  async sendOtp(email: string, code: string) {
+  async sendOtp(email: string, code: string, expires: string) {
     await this.transporter.sendMail({
       from: process.env.FROM_EMAIL,
       to: email,
-      subject: `{code} is your login code`,
+      subject: `${code} is your Inventory System login code`,
       html: `
         <h2>Your login code</h2>
         <p>Enter this code to log in: <strong>${code}</strong></p>
-        <p>This code expires in 10 minutes.</p>
+        <p>This code expires in ${expires}.</p>
       `,
     });
   }

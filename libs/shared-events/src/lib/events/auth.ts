@@ -5,6 +5,7 @@ export interface AuthOtpCreatedEvent extends BaseEvent {
   data: {
     email: string;
     code: string;
+    createdAt: Date;
     expires: Date;
   };
 }
@@ -17,4 +18,4 @@ export interface AuthSignInEvent extends BaseEvent {
   };
 }
 
-export type AuthEvent = AuthOtpCreatedEvent;
+export type AuthEvent = AuthOtpCreatedEvent | AuthSignInEvent;
