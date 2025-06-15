@@ -1,13 +1,17 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {PrismaService} from '../prisma.service';
-import {UserDto} from './dto/user.dto';
 import {Prisma} from '@prisma/client';
-import {randomBytes, verify} from 'crypto';
+import {randomBytes} from 'crypto';
 import {addMinutes} from 'date-fns';
 import crypto from 'crypto';
 import {JwtService} from '@nestjs/jwt';
 import {AuthMapper} from './auth.mapper';
 import {TokenDto} from './dto/token.dto';
+import {
+  AuthOtpCreatedEvent,
+  AuthSignInEvent,
+  EventPublisher,
+} from '@gddy-coding-exercise/shared-events';
 
 function generateOTP(length: number = 6): string {
   const pool = '0123456789';
@@ -27,6 +31,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private eventPublisher: EventPublisher,
   ) {}
 
   async createVerificationToken(
@@ -35,10 +40,20 @@ export class AuthService {
   ): Promise<Prisma.VerificationTokenGetPayload<{}>> {
     const token = generateOTP();
     const expires = addMinutes(now, 10);
-    Logger.log(token);
-    return this.prisma.verificationToken.create({
+    const verificationToken = this.prisma.verificationToken.create({
       data: {identifier, token: hashToken(token), expires},
     });
+
+    await this.eventPublisher.publish<AuthOtpCreatedEvent>({
+      eventType: 'auth.otp-created',
+      data: {
+        email: identifier,
+        code: token,
+        expires: expires,
+      },
+    });
+
+    return verificationToken;
   }
 
   async useVerificationToken(
@@ -81,6 +96,14 @@ export class AuthService {
             },
           },
         },
+      },
+    });
+
+    await this.eventPublisher.publish<AuthSignInEvent>({
+      eventType: 'auth.sign-in',
+      data: {
+        userId: user.id,
+        signedInAt: now,
       },
     });
 

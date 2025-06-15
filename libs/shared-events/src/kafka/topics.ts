@@ -3,6 +3,7 @@ import {Kafka} from 'kafkajs';
 export const TOPICS = {
   PROCUREMENT: 'procurement',
   INVENTORY: 'inventory',
+  AUTH: 'auth',
 } as const;
 
 const MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -23,6 +24,13 @@ export const TOPIC_CONFIGS = {
     numPartitions: 20,
     configEntries: [
       {name: 'retention.ms', value: `${daysAsMillis(30)}`},
+      {name: 'cleanup.policy', value: 'delete'},
+    ],
+  },
+  [TOPICS.AUTH]: {
+    numPartitions: 10,
+    configEntries: [
+      {name: 'retention.ms', value: `${daysAsMillis(7)}`},
       {name: 'cleanup.policy', value: 'delete'},
     ],
   },
