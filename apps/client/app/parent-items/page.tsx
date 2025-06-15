@@ -9,7 +9,6 @@ export default async function Index() {
     data,
     (items) => (
       <>
-        <h1 className="text-2xl">Parent Items</h1>
         <table className="border-collapse table-auto w-full text-sm">
           <thead>
             <tr>

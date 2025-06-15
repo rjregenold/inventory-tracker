@@ -1,3 +1,4 @@
+import {AuthProvider} from '@/lib/contexts/auth-context';
 import './global.css';
 import Navbar from './navbar';
 
@@ -10,10 +11,12 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" data-theme="dark">
       <body>
-        <div className="container mx-auto">
-          <Navbar />
-          <div className="mx-6">{children}</div>
-        </div>
+        <AuthProvider>
+          <div className="container mx-auto">
+            <Navbar />
+            <div className="mx-2">{children}</div>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
