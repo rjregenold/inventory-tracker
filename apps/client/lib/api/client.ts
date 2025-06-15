@@ -74,5 +74,12 @@ export class ApiClient {
     return this.request<T>(endpoint, {...options, method: 'GET'});
   }
 
+  async post<T>(
+    endpoint: string,
+    options?: RequestInit,
+  ): Promise<Result<T, ApiError>> {
+    return this.request<T>(endpoint, {...options, method: 'POST'});
+  }
+
   // TODO: implement additional verbs
 }

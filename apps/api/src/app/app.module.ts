@@ -7,10 +7,12 @@ import {ParentItemsModule} from '../parent-items/parent-items.module';
 import {PurchaseOrdersModule} from '../purchase-orders/purchase-orders.module';
 import {VendorsModule} from '../vendors/vendors.module';
 import {EventsModule} from '../events/events.module';
+import {AuthModule} from '../auth/auth.module';
 
 @Module({
   imports: [
     GracefulShutdownModule.forRoot(),
+    AuthModule,
     ParentItemsModule,
     PurchaseOrdersModule,
     VendorsModule,
