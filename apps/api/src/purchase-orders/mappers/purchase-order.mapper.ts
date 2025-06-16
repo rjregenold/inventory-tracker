@@ -27,6 +27,7 @@ export class PurchaseOrderMapper {
   ): PurchaseOrderSummaryDto {
     return {
       id: purchaseOrder.id,
+      status: purchaseOrder.status,
       vendorName: purchaseOrder.vendorName,
       orderDate: purchaseOrder.orderDate,
       expectedDeliveryDate: purchaseOrder.expectedDeliveryDate,
@@ -43,6 +44,7 @@ export class PurchaseOrderMapper {
     return {
       id: purchaseOrder.id,
       vendorName: purchaseOrder.vendorName,
+      status: purchaseOrder.status,
       orderDate: purchaseOrder.orderDate,
       expectedDeliveryDate: purchaseOrder.expectedDeliveryDate,
       lineItems: purchaseOrder.lineItems.map((lineItem) => ({

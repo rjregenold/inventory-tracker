@@ -8,6 +8,7 @@ import {EmailService} from '../email/email.service';
 import {
   ProcurementEvent,
   PurchaseOrderCreatedEvent,
+  PurchaseOrderStatusChangedEvent,
 } from '@gddy-coding-exercise/shared-events';
 import {Controller, Logger} from '@nestjs/common';
 
@@ -33,6 +34,9 @@ export class ProcurementController {
         case 'procurement.purchase-order-created':
           await this.handlePurchaseOrderCreated(event);
           break;
+        case 'procurement.purchase-order-status-changed':
+          await this.handlePurchaseOrderStatusChanged(event);
+          break;
         default:
           this.logger.warn(`unknown event type ${(event as any).eventType}`);
           break;
@@ -45,5 +49,20 @@ export class ProcurementController {
 
   private async handlePurchaseOrderCreated(event: PurchaseOrderCreatedEvent) {
     await this.emailService.sendOrderApprovalNeeded(event);
+  }
+
+  private async handlePurchaseOrderStatusChanged(
+    event: PurchaseOrderStatusChangedEvent,
+  ) {
+    if (event.data.oldStatus === 'pending') {
+      switch (event.data.newStatus) {
+        case 'approved':
+          await this.emailService.sendPurchaseOrderApproved(event);
+          break;
+        case 'denied':
+          await this.emailService.sendPurchaseOrderDenied(event);
+          break;
+      }
+    }
   }
 }

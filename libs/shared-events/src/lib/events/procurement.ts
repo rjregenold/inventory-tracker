@@ -22,4 +22,16 @@ export interface PurchaseOrderCreatedEvent extends BaseEvent {
   };
 }
 
-export type ProcurementEvent = PurchaseOrderCreatedEvent;
+export interface PurchaseOrderStatusChangedEvent extends BaseEvent {
+  eventType: 'procurement.purchase-order-status-changed';
+  data: {
+    purchaseOrderId: number;
+    createdBy: string;
+    oldStatus: string;
+    newStatus: string;
+  };
+}
+
+export type ProcurementEvent =
+  | PurchaseOrderCreatedEvent
+  | PurchaseOrderStatusChangedEvent;

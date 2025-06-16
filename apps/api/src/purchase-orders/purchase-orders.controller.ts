@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,7 +18,6 @@ import {AuthGuard} from '@nestjs/passport';
 import {Permission, PermissionGuard} from '../auth/permission.guard';
 import {CurrentUser} from '../auth/user.decorator';
 import {JwtPayload} from '../auth/jwt.strategy';
-import {AuthMapper} from '../auth/auth.mapper';
 
 @Controller('purchase-orders')
 @UseGuards(AuthGuard('jwt'), PermissionGuard)
@@ -49,5 +49,17 @@ export class PurchaseOrdersController {
     @CurrentUser() user: JwtPayload,
   ) {
     return await this.purchaseOrdersService.create(dto, user);
+  }
+
+  @Put(':id/approve')
+  @Permission('approve', 'purchase_order')
+  async approve(@Param('id') id: string) {
+    return this.purchaseOrdersService.updateApprovalStatus(+id, 'approved');
+  }
+
+  @Put(':id/deny')
+  @Permission('approve', 'purchase_order')
+  async deny(@Param('id') id: string) {
+    return await this.purchaseOrdersService.updateApprovalStatus(+id, 'denied');
   }
 }

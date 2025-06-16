@@ -9,6 +9,7 @@ import {VendorsService} from '../vendors/vendors.service';
 import {
   EventPublisher,
   PurchaseOrderCreatedEvent,
+  PurchaseOrderStatusChangedEvent,
 } from '@gddy-coding-exercise/shared-events';
 import {UsersService} from '../users/users.service';
 import {JwtPayload} from '../auth/jwt.strategy';
@@ -85,6 +86,7 @@ export class PurchaseOrdersService {
     const now = new Date();
     const purchaseOrder = await this.prisma.purchaseOrder.create({
       data: {
+        createdById: user.id,
         vendorName: vendor.name,
         orderDate: now,
         lineItems: {
@@ -135,5 +137,54 @@ export class PurchaseOrdersService {
     });
 
     return fullDto;
+  }
+
+  async updateApprovalStatus(
+    id: number,
+    status: string,
+  ): Promise<PurchaseOrderFullDto> {
+    const oldOrder = await this.prisma.purchaseOrder.findUnique({
+      where: {id},
+      select: {
+        status: true,
+      },
+    });
+
+    if (!oldOrder) return null;
+
+    const purchaseOrder = await this.prisma.purchaseOrder.update({
+      where: {id},
+      data: {
+        status,
+      },
+      include: {
+        createdBy: true,
+        lineItems: {
+          include: {
+            item: {
+              include: {
+                parentItem: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!purchaseOrder) {
+      return null;
+    }
+
+    this.eventPublisher.publish<PurchaseOrderStatusChangedEvent>({
+      eventType: 'procurement.purchase-order-status-changed',
+      data: {
+        purchaseOrderId: purchaseOrder.id,
+        createdBy: purchaseOrder.createdBy.email,
+        oldStatus: oldOrder.status,
+        newStatus: purchaseOrder.status,
+      },
+    });
+
+    return PurchaseOrderMapper.toFullDto(purchaseOrder);
   }
 }

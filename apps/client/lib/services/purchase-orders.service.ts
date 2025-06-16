@@ -17,6 +17,7 @@ const unwrapPurchaseOrderId = (id: PurchaseOrderId): number => id as number;
 
 interface PurchaseOrderSummaryApi {
   id: number;
+  status: string;
   vendorName: string;
   orderDate: string;
   expectedDeliveryDate: string;
@@ -26,6 +27,7 @@ interface PurchaseOrderSummaryApi {
 
 export interface PurchaseOrderSummary {
   id: PurchaseOrderId;
+  status: string;
   vendorName: string;
   orderDate: Date;
   expectedDeliveryDate: Date;
@@ -87,6 +89,7 @@ function transformLineItem(
 
 interface PurchaseOrderFullApi {
   id: PurchaseOrderId;
+  status: string;
   vendorName: string;
   orderDate: string;
   expectedDeliveryDate: string;
@@ -97,6 +100,7 @@ interface PurchaseOrderFullApi {
 
 export interface PurchaseOrderFull {
   id: PurchaseOrderId;
+  status: string;
   vendorName: string;
   orderDate: Date;
   expectedDeliveryDate: Date;
@@ -141,6 +145,20 @@ export namespace PurchaseOrderService {
   export async function findOne(id: PurchaseOrderId) {
     const res = await inventoryApi.get<PurchaseOrderFullApi>(
       `/purchase-orders/${unwrapPurchaseOrderId(id)}`,
+    );
+    return Result.biFlatMap(res, transformFull, ApiError.toString);
+  }
+
+  export async function approve(id: PurchaseOrderId) {
+    const res = await inventoryApi.put<PurchaseOrderFullApi>(
+      `/purchase-orders/${unwrapPurchaseOrderId(id)}/approve`,
+    );
+    return Result.biFlatMap(res, transformFull, ApiError.toString);
+  }
+
+  export async function deny(id: PurchaseOrderId) {
+    const res = await inventoryApi.put<PurchaseOrderFullApi>(
+      `/purchase-orders/${unwrapPurchaseOrderId(id)}/deny`,
     );
     return Result.biFlatMap(res, transformFull, ApiError.toString);
   }

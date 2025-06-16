@@ -50,13 +50,14 @@ model VerificationToken {
 }
 
 model User {
-  id          String     @id @default(cuid())
-  email       String     @unique
-  name        String?
-  userRoles   UserRole[]
-  lastLoginAt DateTime?  @map("last_login_at")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime?  @updatedAt @map("updated_at")
+  id             String     @id @default(cuid())
+  email          String     @unique
+  name           String?
+  userRoles      UserRole[]
+  purchaseOrders PurchaseOrder[]
+  lastLoginAt    DateTime?  @map("last_login_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime?  @updatedAt @map("updated_at")
   @@map("users")
 }
 
@@ -106,6 +107,9 @@ model PurchaseOrder {
   vendorName           String    @map("vendor_name")
   orderDate            DateTime  @map("order_date")
   expectedDeliveryDate DateTime  @map("expected_delivery_date")
+  status               String    @default("pending")
+  createdBy            User      @relation(fields: [createdById], references: [id])
+  createdById          String    @map("created_by_id")
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime? @updatedAt @map("updated_at")
 

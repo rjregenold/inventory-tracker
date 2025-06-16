@@ -91,5 +91,12 @@ export class ApiClient {
     return this.request<T>(endpoint, {...options, method: 'POST'});
   }
 
+  async put<T>(
+    endpoint: string,
+    options?: RequestInit,
+  ): Promise<Result<T, ApiError>> {
+    return this.request<T>(endpoint, {...options, method: 'PUT'});
+  }
+
   // TODO: implement additional verbs
 }

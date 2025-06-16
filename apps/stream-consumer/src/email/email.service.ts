@@ -1,4 +1,7 @@
-import {PurchaseOrderCreatedEvent} from '@gddy-coding-exercise/shared-events';
+import {
+  PurchaseOrderCreatedEvent,
+  PurchaseOrderStatusChangedEvent,
+} from '@gddy-coding-exercise/shared-events';
 import {Injectable, Logger} from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
@@ -54,6 +57,34 @@ export class EmailService {
         <div>Expected Delivery Date: ${event.data.expectedDeliveryDate}</div>
         <div>Created by: ${event.data.createdBy}</div>
         <div>Line Item Count: ${event.data.items.length}</div>
+        <br><br>
+        <p><a href="http://localhost:4200/purchase-orders/${event.data.purchaseOrderId}">Click here to review</a></p>
+      `,
+    });
+  }
+
+  async sendPurchaseOrderApproved(event: PurchaseOrderStatusChangedEvent) {
+    await this.transporter.sendMail({
+      from: process.env.FROM_EMAIL,
+      to: event.data.createdBy,
+      subject: `Purchase Order # ${event.data.purchaseOrderId} Approved`,
+      html: `
+        <h2>Purchase Order Approved</h2>
+        <p>A purchase order you created has been approved.</p>
+        <br><br>
+        <p><a href="http://localhost:4200/purchase-orders/${event.data.purchaseOrderId}">Click here to review</a></p>
+      `,
+    });
+  }
+
+  async sendPurchaseOrderDenied(event: PurchaseOrderStatusChangedEvent) {
+    await this.transporter.sendMail({
+      from: process.env.FROM_EMAIL,
+      to: event.data.createdBy,
+      subject: `Purchase Order # ${event.data.purchaseOrderId} Denied`,
+      html: `
+        <h2>Purchase Order Denied</h2>
+        <p>A purchase order you created has been denied.</p>
         <br><br>
         <p><a href="http://localhost:4200/purchase-orders/${event.data.purchaseOrderId}">Click here to review</a></p>
       `,

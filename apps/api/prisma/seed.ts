@@ -4,6 +4,12 @@ import {Decimal} from 'decimal.js';
 const prisma = new PrismaClient();
 
 async function seedInventory() {
+  const seedUser = await prisma.user.create({
+    data: {
+      email: 'seed@system.local',
+    },
+  });
+
   const tshirt = await prisma.parentItem.create({
     data: {
       name: 'T-shirt',
@@ -78,7 +84,9 @@ async function seedInventory() {
 
   await prisma.purchaseOrder.create({
     data: {
+      createdById: seedUser.id,
       vendorName: 'Levis',
+      status: 'approved',
       orderDate: new Date(2023, 1, 1),
       expectedDeliveryDate: new Date(2023, 3, 10),
       lineItems: {
@@ -93,7 +101,9 @@ async function seedInventory() {
 
   await prisma.purchaseOrder.create({
     data: {
+      createdById: seedUser.id,
       vendorName: 'Bonobos',
+      status: 'approved',
       orderDate: new Date(2023, 2, 1),
       expectedDeliveryDate: new Date(2023, 4, 10),
       lineItems: {
@@ -108,7 +118,9 @@ async function seedInventory() {
 
   await prisma.purchaseOrder.create({
     data: {
+      createdById: seedUser.id,
       vendorName: 'Scotch and Soda',
+      status: 'approved',
       orderDate: new Date(2023, 3, 1),
       expectedDeliveryDate: new Date(2023, 5, 10),
       lineItems: {

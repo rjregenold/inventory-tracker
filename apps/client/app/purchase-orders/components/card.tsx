@@ -42,6 +42,10 @@ export default function Card({purchaseOrder}: Props) {
             {renderMeta('Order Placed', formatDate(purchaseOrder.orderDate))}
             {renderMeta('Total', formatCurrency(purchaseOrder.totalCost))}
             {renderMeta('Quantity', purchaseOrder.totalQuantity)}
+            {renderMeta(
+              'Status',
+              <span className="capitalize">{purchaseOrder.status}</span>,
+            )}
           </div>
           <div className="text-right">
             <span className="text-xs uppercase">Order #{purchaseOrder.id}</span>
