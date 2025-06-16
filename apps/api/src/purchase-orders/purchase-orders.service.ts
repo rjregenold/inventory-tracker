@@ -8,8 +8,11 @@ import {CreatePurchaseOrderDto} from './create-purchase-order-dto';
 import {VendorsService} from '../vendors/vendors.service';
 import {
   EventPublisher,
-  PurchaseOrderCreated,
+  PurchaseOrderCreatedEvent,
+  PurchaseOrderStatusChangedEvent,
 } from '@gddy-coding-exercise/shared-events';
+import {UsersService} from '../users/users.service';
+import {JwtPayload} from '../auth/jwt.strategy';
 
 @Injectable()
 export class PurchaseOrdersService {
@@ -17,6 +20,7 @@ export class PurchaseOrdersService {
     private prisma: PrismaService,
     private vendorsService: VendorsService,
     private eventPublisher: EventPublisher,
+    private usersService: UsersService,
   ) {}
 
   async findAll(): Promise<PurchaseOrderSummaryDto[]> {
@@ -58,7 +62,10 @@ export class PurchaseOrdersService {
     return PurchaseOrderMapper.toFullDto(purchaseOrder);
   }
 
-  async create(dto: CreatePurchaseOrderDto): Promise<PurchaseOrderFullDto> {
+  async create(
+    dto: CreatePurchaseOrderDto,
+    user: JwtPayload,
+  ): Promise<PurchaseOrderFullDto> {
     const vendor = await this.vendorsService.findByName(dto.vendorName);
     if (!vendor) {
       throw new BadRequestException('vendor not found');
@@ -79,6 +86,7 @@ export class PurchaseOrdersService {
     const now = new Date();
     const purchaseOrder = await this.prisma.purchaseOrder.create({
       data: {
+        createdById: user.id,
         vendorName: vendor.name,
         orderDate: now,
         lineItems: {
@@ -106,7 +114,8 @@ export class PurchaseOrdersService {
     });
 
     const fullDto = PurchaseOrderMapper.toFullDto(purchaseOrder);
-    this.eventPublisher.publish<PurchaseOrderCreated>({
+    const approvers = await this.usersService.allByRole('purchase_approver');
+    this.eventPublisher.publish<PurchaseOrderCreatedEvent>({
       eventType: 'procurement.purchase-order-created',
       data: {
         purchaseOrderId: fullDto.id,
@@ -122,9 +131,60 @@ export class PurchaseOrdersService {
         totalCost: fullDto.totalCost,
         orderedDate: fullDto.orderDate,
         expectedDeliveryDate: fullDto.expectedDeliveryDate,
+        createdBy: user.email,
+        approvers: approvers.map((x) => x.email),
       },
     });
 
     return fullDto;
+  }
+
+  async updateApprovalStatus(
+    id: number,
+    status: string,
+  ): Promise<PurchaseOrderFullDto> {
+    const oldOrder = await this.prisma.purchaseOrder.findUnique({
+      where: {id},
+      select: {
+        status: true,
+      },
+    });
+
+    if (!oldOrder) return null;
+
+    const purchaseOrder = await this.prisma.purchaseOrder.update({
+      where: {id},
+      data: {
+        status,
+      },
+      include: {
+        createdBy: true,
+        lineItems: {
+          include: {
+            item: {
+              include: {
+                parentItem: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!purchaseOrder) {
+      return null;
+    }
+
+    this.eventPublisher.publish<PurchaseOrderStatusChangedEvent>({
+      eventType: 'procurement.purchase-order-status-changed',
+      data: {
+        purchaseOrderId: purchaseOrder.id,
+        createdBy: purchaseOrder.createdBy.email,
+        oldStatus: oldOrder.status,
+        newStatus: purchaseOrder.status,
+      },
+    });
+
+    return PurchaseOrderMapper.toFullDto(purchaseOrder);
   }
 }

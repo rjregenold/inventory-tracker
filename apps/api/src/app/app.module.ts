@@ -8,6 +8,7 @@ import {PurchaseOrdersModule} from '../purchase-orders/purchase-orders.module';
 import {VendorsModule} from '../vendors/vendors.module';
 import {EventsModule} from '../events/events.module';
 import {AuthModule} from '../auth/auth.module';
+import {UsersModule} from '../users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import {AuthModule} from '../auth/auth.module';
     PurchaseOrdersModule,
     VendorsModule,
     EventsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

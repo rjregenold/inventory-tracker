@@ -1,8 +1,14 @@
-import {Injectable} from '@nestjs/common';
+import {
+  PurchaseOrderCreatedEvent,
+  PurchaseOrderStatusChangedEvent,
+} from '@gddy-coding-exercise/shared-events';
+import {Injectable, Logger} from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
+  private readonly logger: Logger = new Logger(EmailService.name);
+
   private transporter: nodemailer.Transporter;
 
   constructor() {
@@ -26,6 +32,61 @@ export class EmailService {
         <h2>Your login code</h2>
         <p>Enter this code to log in: <strong>${code}</strong></p>
         <p>This code expires in ${expires}.</p>
+      `,
+    });
+  }
+
+  async sendOrderApprovalNeeded(event: PurchaseOrderCreatedEvent) {
+    if (!event.data.approvers?.length) {
+      this.logger.warn(
+        `received approval event with no approvers. purchase order # ${event.data.purchaseOrderId}`,
+      );
+      return;
+    }
+
+    await this.transporter.sendMail({
+      from: process.env.FROM_EMAIL,
+      to: event.data.approvers,
+      subject: `Purchase Order # ${event.data.purchaseOrderId} Needs Approval`,
+      html: `
+        <h2>Purchase Order Needs Approval</h2>
+        <p>The details are below:</p>
+        <div>Vendor name: ${event.data.vendorName}</div>
+        <div>Total Quantity: ${event.data.totalQuantity}</div>
+        <div>Total Cost: $${event.data.totalCost}</div>
+        <div>Expected Delivery Date: ${event.data.expectedDeliveryDate}</div>
+        <div>Created by: ${event.data.createdBy}</div>
+        <div>Line Item Count: ${event.data.items.length}</div>
+        <br><br>
+        <p><a href="http://localhost:4200/purchase-orders/${event.data.purchaseOrderId}">Click here to review</a></p>
+      `,
+    });
+  }
+
+  async sendPurchaseOrderApproved(event: PurchaseOrderStatusChangedEvent) {
+    await this.transporter.sendMail({
+      from: process.env.FROM_EMAIL,
+      to: event.data.createdBy,
+      subject: `Purchase Order # ${event.data.purchaseOrderId} Approved`,
+      html: `
+        <h2>Purchase Order Approved</h2>
+        <p>A purchase order you created has been approved.</p>
+        <br><br>
+        <p><a href="http://localhost:4200/purchase-orders/${event.data.purchaseOrderId}">Click here to review</a></p>
+      `,
+    });
+  }
+
+  async sendPurchaseOrderDenied(event: PurchaseOrderStatusChangedEvent) {
+    await this.transporter.sendMail({
+      from: process.env.FROM_EMAIL,
+      to: event.data.createdBy,
+      subject: `Purchase Order # ${event.data.purchaseOrderId} Denied`,
+      html: `
+        <h2>Purchase Order Denied</h2>
+        <p>A purchase order you created has been denied.</p>
+        <br><br>
+        <p><a href="http://localhost:4200/purchase-orders/${event.data.purchaseOrderId}">Click here to review</a></p>
       `,
     });
   }

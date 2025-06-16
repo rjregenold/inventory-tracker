@@ -1,4 +1,4 @@
-import {Injectable, Logger} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {PrismaService} from '../prisma.service';
 import {Prisma} from '@prisma/client';
 import {randomBytes} from 'crypto';
@@ -66,7 +66,6 @@ export class AuthService {
       const verificationToken = await this.prisma.verificationToken.delete({
         where: {identifier_token: {identifier, token: hashToken(token)}},
       });
-      Logger.log(verificationToken);
       if (verificationToken.expires < now) return null;
       return verificationToken;
     } catch (err) {

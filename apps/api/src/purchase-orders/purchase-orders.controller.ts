@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -15,6 +16,8 @@ import {PurchaseOrdersService} from './purchase-orders.service';
 import {CreatePurchaseOrderDto} from './create-purchase-order-dto';
 import {AuthGuard} from '@nestjs/passport';
 import {Permission, PermissionGuard} from '../auth/permission.guard';
+import {CurrentUser} from '../auth/user.decorator';
+import {JwtPayload} from '../auth/jwt.strategy';
 
 @Controller('purchase-orders')
 @UseGuards(AuthGuard('jwt'), PermissionGuard)
@@ -41,7 +44,22 @@ export class PurchaseOrdersController {
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({transform: true}))
   @Permission('create', 'purchase_order')
-  async create(@Body() dto: CreatePurchaseOrderDto) {
-    return await this.purchaseOrdersService.create(dto);
+  async create(
+    @Body() dto: CreatePurchaseOrderDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return await this.purchaseOrdersService.create(dto, user);
+  }
+
+  @Put(':id/approve')
+  @Permission('approve', 'purchase_order')
+  async approve(@Param('id') id: string) {
+    return this.purchaseOrdersService.updateApprovalStatus(+id, 'approved');
+  }
+
+  @Put(':id/deny')
+  @Permission('approve', 'purchase_order')
+  async deny(@Param('id') id: string) {
+    return await this.purchaseOrdersService.updateApprovalStatus(+id, 'denied');
   }
 }

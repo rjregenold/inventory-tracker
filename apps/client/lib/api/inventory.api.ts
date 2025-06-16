@@ -11,4 +11,4 @@ function onAuthToken(token: string | null) {
   inventoryApi.setBearerToken(token);
 }
 
-AuthService.addAuthTokenListener(onAuthToken);
+AuthService.addAuthTokenListener(onAuthToken, true);

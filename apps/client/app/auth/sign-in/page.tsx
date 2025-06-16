@@ -4,18 +4,21 @@ import {ApiError} from '@/lib/api/client';
 import {useAuth} from '@/lib/contexts/auth-context';
 import {AuthService} from '@/lib/services/auth.service';
 import {Result} from '@/lib/types/result';
-import {useRouter} from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
 import {useState} from 'react';
 
 export default function SignIn() {
   const {signIn} = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const redirectTo = searchParams.get('redirect') || '/purchase-orders';
 
   const requestOtp = async () => {
     setLoading(true);
@@ -38,7 +41,7 @@ export default function SignIn() {
         if (token) {
           signIn(token);
           setLoading(false);
-          return router.push('/purchase-orders');
+          return router.push(redirectTo);
         }
         setError('Sign in failed. Please try again.');
       },

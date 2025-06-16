@@ -24,14 +24,10 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
   useEffect(() => {
     const token = AuthService.getJwt();
     if (token) {
-      try {
-        if (User.isTokenActive(token)) {
-          setUser(User.fromToken(token));
-          AuthService.setAuthToken(token);
-        } else {
-          AuthService.clearJwt();
-        }
-      } catch (error) {
+      if (User.isTokenActive(token)) {
+        setUser(User.fromToken(token));
+        AuthService.setAuthToken(token);
+      } else {
         AuthService.clearJwt();
       }
     }
@@ -45,9 +41,10 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
   };
 
   const signOut = () => {
-    AuthService.clearJwt();
-    setUser(null);
     router.push('/');
+    setUser(null);
+    AuthService.clearJwt();
+    AuthService.setAuthToken(null);
   };
 
   const redirectSignIn = () => {

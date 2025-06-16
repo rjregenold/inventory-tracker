@@ -19,7 +19,13 @@ export namespace AuthService {
 
   let authTokenListeners: AuthTokenCallback[] = [];
 
-  export function addAuthTokenListener(fn: AuthTokenCallback) {
+  export function addAuthTokenListener(
+    fn: AuthTokenCallback,
+    immediate: boolean = false,
+  ) {
+    if (immediate) {
+      fn(getAuthToken());
+    }
     authTokenListeners.push(fn);
   }
 
@@ -49,7 +55,18 @@ export namespace AuthService {
     return Result.map(res, (x) => x?.token ?? null);
   }
 
-  export function setAuthToken(jwt: string) {
+  export async function refreshToken(): Promise<
+    Result<string | null, ApiError>
+  > {
+    const res = await authApi.put<ApiToken | null>('/auth/token', {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    return Result.map(res, (x) => x?.token ?? null);
+  }
+
+  export function setAuthToken(jwt: string | null) {
     authToken = jwt;
     emitAuthToken(jwt);
   }

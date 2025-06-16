@@ -14,6 +14,7 @@ export class PurchaseOrderLineItemDto {
 export class PurchaseOrderFullDto {
   id: number;
   vendorName: string;
+  status: string;
   orderDate: Date;
   expectedDeliveryDate: Date;
   lineItems: PurchaseOrderLineItemDto[];

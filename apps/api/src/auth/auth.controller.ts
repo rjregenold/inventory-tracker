@@ -6,8 +6,12 @@ import {
   HttpStatus,
   NotFoundException,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {AuthService} from './auth.service';
+import {CurrentUser} from './user.decorator';
+import {JwtPayload} from './jwt.strategy';
+import {AuthGuard} from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +42,13 @@ export class AuthController {
       verificationToken.identifier,
       now,
     );
+  }
+
+  @Put('token')
+  @UseGuards(AuthGuard('jwt'))
+  async refreshToken(@CurrentUser() user: JwtPayload) {
+    const now = new Date();
+    return await this.authService.generateJwtForUser(user.email, now);
   }
 
   // we would never actually expose an endpoint like this in a real application,
