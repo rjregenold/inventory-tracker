@@ -17,6 +17,7 @@ interface Props {
 }
 
 export default function Page(props: Props) {
+  const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [purchaseOrderRes, setPurchaseOrderRes] = useState<Result<
     PurchaseOrderFull,
@@ -29,7 +30,14 @@ export default function Page(props: Props) {
   }
 
   const id = idRes.data;
+
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     const fetchPurchaseOrder = async () => {
       setLoading(true);
       const result = await PurchaseOrderService.findOne(id);
@@ -38,7 +46,7 @@ export default function Page(props: Props) {
     };
 
     fetchPurchaseOrder();
-  }, [id]);
+  }, [id, isMounted]);
 
   const onApprove = async (purchaseOrder: PurchaseOrderFull) => {
     if (confirm('Are you sure you want to approve this purchase order?')) {
@@ -51,6 +59,10 @@ export default function Page(props: Props) {
       setPurchaseOrderRes(await PurchaseOrderService.deny(purchaseOrder.id));
     }
   };
+
+  if (!isMounted) {
+    return <Loading />;
+  }
 
   return (
     <PermissionGuard action="read" resource="purchase_order">
