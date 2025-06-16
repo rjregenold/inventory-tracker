@@ -9,15 +9,19 @@ const publicRoutes = [AuthService.SIGN_IN_ROUTE, '/'];
 export function middleware(request: NextRequest) {
   const token = cookies().get(AuthService.USER_TOKEN_KEY)?.value;
 
-  const {pathname} = request.nextUrl;
+  const {pathname, search} = request.nextUrl;
 
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
   if (!token || !User.isTokenActive(token)) {
+    const redirectTo = encodeURIComponent(pathname + search);
     return NextResponse.redirect(
-      new URL(AuthService.SIGN_IN_ROUTE, request.url),
+      new URL(
+        `${AuthService.SIGN_IN_ROUTE}?redirect=${redirectTo}`,
+        request.url,
+      ),
     );
   }
 
