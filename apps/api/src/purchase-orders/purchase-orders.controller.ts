@@ -15,6 +15,9 @@ import {PurchaseOrdersService} from './purchase-orders.service';
 import {CreatePurchaseOrderDto} from './create-purchase-order-dto';
 import {AuthGuard} from '@nestjs/passport';
 import {Permission, PermissionGuard} from '../auth/permission.guard';
+import {CurrentUser} from '../auth/user.decorator';
+import {JwtPayload} from '../auth/jwt.strategy';
+import {AuthMapper} from '../auth/auth.mapper';
 
 @Controller('purchase-orders')
 @UseGuards(AuthGuard('jwt'), PermissionGuard)
@@ -41,7 +44,10 @@ export class PurchaseOrdersController {
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({transform: true}))
   @Permission('create', 'purchase_order')
-  async create(@Body() dto: CreatePurchaseOrderDto) {
-    return await this.purchaseOrdersService.create(dto);
+  async create(
+    @Body() dto: CreatePurchaseOrderDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return await this.purchaseOrdersService.create(dto, user);
   }
 }

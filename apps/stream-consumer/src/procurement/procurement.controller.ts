@@ -4,23 +4,22 @@ import {
   MessagePattern,
   Payload,
 } from '@nestjs/microservices';
-import {formatDistance} from 'date-fns';
 import {EmailService} from '../email/email.service';
 import {
-  AuthEvent,
-  AuthOtpCreatedEvent,
+  ProcurementEvent,
+  PurchaseOrderCreatedEvent,
 } from '@gddy-coding-exercise/shared-events';
 import {Controller, Logger} from '@nestjs/common';
 
 @Controller()
-export class AuthController {
-  private readonly logger = new Logger(AuthController.name);
+export class ProcurementController {
+  private readonly logger = new Logger(ProcurementController.name);
 
   constructor(private emailService: EmailService) {}
 
-  @MessagePattern('auth')
-  async handleAuthEvent(
-    @Payload() event: AuthEvent,
+  @MessagePattern('procurement')
+  async handleEvent(
+    @Payload() event: ProcurementEvent,
     @Ctx() context: KafkaContext,
   ) {
     const partition = context.getPartition();
@@ -31,11 +30,8 @@ export class AuthController {
 
     try {
       switch (event.eventType) {
-        case 'auth.otp-created':
-          await this.handleOtpCreated(event);
-          break;
-        case 'auth.sign-in':
-          // could send welcome email on new sign up
+        case 'procurement.purchase-order-created':
+          await this.handlePurchaseOrderCreated(event);
           break;
         default:
           this.logger.warn(`unknown event type ${(event as any).eventType}`);
@@ -47,13 +43,7 @@ export class AuthController {
     }
   }
 
-  private async handleOtpCreated(event: AuthOtpCreatedEvent) {
-    const {email, code, expires, createdAt} = event.data;
-
-    await this.emailService.sendOtp(
-      email,
-      code,
-      formatDistance(expires, createdAt),
-    );
+  private async handlePurchaseOrderCreated(event: PurchaseOrderCreatedEvent) {
+    await this.emailService.sendOrderApprovalNeeded(event);
   }
 }

@@ -31,6 +31,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const activeNavItem = getActiveNavItem(pathname);
 
+  const userFirstLetter = user ? user.email[0] : null;
+
   return (
     <div className="navbar bg-base-100 mt-2 mb-4 flex">
       <h1 className="text-xl mr-4">Inventory System</h1>
@@ -58,7 +60,7 @@ export default function Navbar() {
             className="btn btn-ghost btn-circle avatar placeholder"
           >
             <div className="bg-neutral text-neutral-content w-12 rounded-full">
-              <span>R</span>
+              <span className="uppercase">{userFirstLetter}</span>
             </div>
           </div>
           <ul

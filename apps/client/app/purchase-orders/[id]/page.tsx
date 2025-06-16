@@ -6,12 +6,15 @@ import {
 import {Result} from '@/lib/types/result';
 import {notFound} from 'next/navigation';
 import Detail from './components/detail';
+import {requirePermission} from '@/lib/auth/server';
 
 interface Props {
   params: {id: string};
 }
 
 export default async function Page(props: Props) {
+  requirePermission('read', 'purchase_order');
+
   const idRes = safePurchaseOrderId(props.params.id);
   if (Result.isErr(idRes)) {
     notFound();

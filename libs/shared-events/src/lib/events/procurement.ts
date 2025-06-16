@@ -1,7 +1,7 @@
 import {BaseEvent} from './base';
 import {Decimal} from 'decimal.js';
 
-export interface PurchaseOrderCreated extends BaseEvent {
+export interface PurchaseOrderCreatedEvent extends BaseEvent {
   eventType: 'procurement.purchase-order-created';
   data: {
     purchaseOrderId: number;
@@ -17,7 +17,9 @@ export interface PurchaseOrderCreated extends BaseEvent {
     totalCost: Decimal;
     orderedDate: Date;
     expectedDeliveryDate: Date;
+    createdBy: string;
+    approvers: string[];
   };
 }
 
-export type ProcurementEvent = PurchaseOrderCreated;
+export type ProcurementEvent = PurchaseOrderCreatedEvent;
