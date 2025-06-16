@@ -3,7 +3,7 @@ import {formatDate} from '@/lib/utils/date';
 import Link from 'next/link';
 import Table from './table';
 import {PurchaseOrderFull} from '@/lib/services/purchase-orders.service';
-import {PermissionGuard} from '@/components/permission-guard';
+import {useAuth} from '@/lib/contexts/auth-context';
 
 interface Props {
   purchaseOrder: PurchaseOrderFull;
@@ -12,6 +12,8 @@ interface Props {
 }
 
 export default function Detail({purchaseOrder, onApprove, onDeny}: Props) {
+  const {hasPermission} = useAuth();
+
   return (
     <>
       <div className="breadcrumbs text-sm mb-4">
@@ -45,8 +47,8 @@ export default function Detail({purchaseOrder, onApprove, onDeny}: Props) {
               {term: 'Line Item Count', value: purchaseOrder.lineItems.length},
             ]}
           />
-          <PermissionGuard action="approve" resource="purchase_order">
-            {purchaseOrder.status === 'pending' && (
+          {hasPermission('approve', 'purchase_order') &&
+            purchaseOrder.status === 'pending' && (
               <div className="card-actions">
                 <button className="btn btn-primary" onClick={() => onApprove()}>
                   Approve
@@ -56,7 +58,6 @@ export default function Detail({purchaseOrder, onApprove, onDeny}: Props) {
                 </button>
               </div>
             )}
-          </PermissionGuard>
         </div>
       </div>
       <div className="card bg-gray-400 text-gray-900 mb-4">

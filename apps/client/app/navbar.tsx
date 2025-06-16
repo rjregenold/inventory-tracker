@@ -3,7 +3,7 @@ import {useAuth} from '@/lib/contexts/auth-context';
 import {AuthService} from '@/lib/services/auth.service';
 import {Result} from '@/lib/types/result';
 import Link from 'next/link';
-import {usePathname} from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 
 interface NavItem {
   href: string;

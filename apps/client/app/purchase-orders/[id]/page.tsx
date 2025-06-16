@@ -11,12 +11,14 @@ import Detail from './components/detail';
 import {useEffect, useState} from 'react';
 import Loading from '../loading';
 import {PermissionGuard} from '@/components/permission-guard';
+import {useAuth} from '@/lib/contexts/auth-context';
 
 interface Props {
   params: {id: string};
 }
 
 export default function Page(props: Props) {
+  const {user} = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [purchaseOrderRes, setPurchaseOrderRes] = useState<Result<
@@ -46,7 +48,7 @@ export default function Page(props: Props) {
     };
 
     fetchPurchaseOrder();
-  }, [id, isMounted]);
+  }, [id, isMounted, user]);
 
   const onApprove = async (purchaseOrder: PurchaseOrderFull) => {
     if (confirm('Are you sure you want to approve this purchase order?')) {

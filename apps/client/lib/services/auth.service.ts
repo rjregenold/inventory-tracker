@@ -66,7 +66,7 @@ export namespace AuthService {
     return Result.map(res, (x) => x?.token ?? null);
   }
 
-  export function setAuthToken(jwt: string) {
+  export function setAuthToken(jwt: string | null) {
     authToken = jwt;
     emitAuthToken(jwt);
   }

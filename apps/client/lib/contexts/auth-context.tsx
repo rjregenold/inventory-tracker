@@ -41,9 +41,10 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
   };
 
   const signOut = () => {
-    AuthService.clearJwt();
-    setUser(null);
     router.push('/');
+    setUser(null);
+    AuthService.clearJwt();
+    AuthService.setAuthToken(null);
   };
 
   const redirectSignIn = () => {
