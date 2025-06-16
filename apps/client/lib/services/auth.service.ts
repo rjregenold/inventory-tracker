@@ -19,7 +19,13 @@ export namespace AuthService {
 
   let authTokenListeners: AuthTokenCallback[] = [];
 
-  export function addAuthTokenListener(fn: AuthTokenCallback) {
+  export function addAuthTokenListener(
+    fn: AuthTokenCallback,
+    immediate: boolean = false,
+  ) {
+    if (immediate) {
+      fn(getAuthToken());
+    }
     authTokenListeners.push(fn);
   }
 
