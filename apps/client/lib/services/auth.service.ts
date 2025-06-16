@@ -55,6 +55,17 @@ export namespace AuthService {
     return Result.map(res, (x) => x?.token ?? null);
   }
 
+  export async function refreshToken(): Promise<
+    Result<string | null, ApiError>
+  > {
+    const res = await authApi.put<ApiToken | null>('/auth/token', {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`,
+      },
+    });
+    return Result.map(res, (x) => x?.token ?? null);
+  }
+
   export function setAuthToken(jwt: string) {
     authToken = jwt;
     emitAuthToken(jwt);

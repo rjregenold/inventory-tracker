@@ -1,5 +1,7 @@
 'use client';
 import {useAuth} from '@/lib/contexts/auth-context';
+import {AuthService} from '@/lib/services/auth.service';
+import {Result} from '@/lib/types/result';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 
@@ -27,11 +29,26 @@ function getActiveNavItem(path: string): NavItem | undefined {
 }
 
 export default function Navbar() {
-  const {user, signOut} = useAuth();
+  const {user, signIn, signOut} = useAuth();
   const pathname = usePathname();
   const activeNavItem = getActiveNavItem(pathname);
 
   const userFirstLetter = user ? user.email[0] : null;
+
+  const refreshToken = async () => {
+    const res = await AuthService.refreshToken();
+    Result.fold(
+      res,
+      (token) => {
+        if (token) {
+          signIn(token);
+          alert('Your token has been refreshed');
+        }
+      },
+      // in a real application we'd show an error
+      (err) => console.error(err),
+    );
+  };
 
   return (
     <div className="navbar bg-base-100 mt-2 mb-4 flex">
@@ -69,6 +86,9 @@ export default function Navbar() {
           >
             <li>
               <a>{user.email}</a>
+            </li>
+            <li>
+              <a onClick={() => refreshToken()}>Refresh auth token</a>
             </li>
             <li>
               <a onClick={() => signOut()}>Sign Out</a>
