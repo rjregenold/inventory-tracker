@@ -7,22 +7,28 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import {PurchaseOrdersService} from './purchase-orders.service';
 import {CreatePurchaseOrderDto} from './create-purchase-order-dto';
+import {AuthGuard} from '@nestjs/passport';
+import {Permission, PermissionGuard} from '../auth/permission.guard';
 
 @Controller('purchase-orders')
+@UseGuards(AuthGuard('jwt'), PermissionGuard)
 export class PurchaseOrdersController {
   constructor(private readonly purchaseOrdersService: PurchaseOrdersService) {}
 
   @Get()
+  @Permission('read', 'purchase_order')
   findAll() {
     return this.purchaseOrdersService.findAll();
   }
 
   @Get(':id')
+  @Permission('read', 'purchase_order')
   async findOne(@Param('id') id: string) {
     const purchaseOrder = await this.purchaseOrdersService.findOne(+id);
     if (!purchaseOrder) {
@@ -34,6 +40,7 @@ export class PurchaseOrdersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe({transform: true}))
+  @Permission('create', 'purchase_order')
   async create(@Body() dto: CreatePurchaseOrderDto) {
     return await this.purchaseOrdersService.create(dto);
   }

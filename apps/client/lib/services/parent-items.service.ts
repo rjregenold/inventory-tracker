@@ -1,5 +1,5 @@
 import {ApiError} from '../api/client';
-import {inventoryApi} from '../api/inventory';
+import {inventoryApi} from '../api/inventory.api';
 import {Result} from '../types/result';
 
 export interface Item {

@@ -1,8 +1,8 @@
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { setupGracefulShutdown } from 'nestjs-graceful-shutdown';
+import {Logger} from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
+import {setupGracefulShutdown} from 'nestjs-graceful-shutdown';
 
-import { AppModule } from './app/app.module';
+import {AppModule} from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,12 +13,12 @@ async function bootstrap() {
 
   // handles signals (SIGINT, SIGTERM) and gives the
   // app an opportunity to shutdown cleanly
-  setupGracefulShutdown({ app })
+  setupGracefulShutdown({app});
 
   const port = process.env.PORT || 3100;
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
   );
 }
 

@@ -7,6 +7,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Add to your existing schema
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String?
+  userRoles   UserRole[]
+  permissions Permission[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String @id @default(cuid())
+  action      String
+  resource    String
+  roleId      String @map("role_id")
+  role        Role   @relation(fields: [roleId], references: [id])
+
+  @@unique([action, resource, roleId])
+  @@map("permissions")
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  roleId String @map("role_id")
+  user   User   @relation(fields: [userId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model User {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  name        String?
+  userRoles   UserRole[]
+  lastLoginAt DateTime?  @map("last_login_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime?  @updatedAt @map("updated_at")
+  @@map("users")
+}
+
 model Item {
   id           Int        @id @default(autoincrement())
   parentItem   ParentItem @relation(fields: [parentItemId], references: [id])
@@ -15,8 +68,8 @@ model Item {
   sku          String
   price        Decimal
   quantity     Int
-  created_at   DateTime?
-  updated_at   DateTime?
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime?  @updatedAt @map("updated_at")
 
   purchaseOrderLineItems PurchaseOrderLineItem[]
 
@@ -26,8 +79,8 @@ model Item {
 model ParentItem {
   id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime? @map("created_at")
-  updatedAt DateTime? @map("updated_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
 
   items Item[]
 
@@ -42,8 +95,8 @@ model PurchaseOrderLineItem {
   itemId          Int           @map("item_id")
   quantity        Int
   unitCost        Decimal       @map("unit_cost")
-  createdAt       DateTime?     @map("created_at")
-  updatedAt       DateTime?     @map("updated_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime?     @updatedAt @map("updated_at")
 
   @@map("purchase_order_line_items")
 }
@@ -53,8 +106,8 @@ model PurchaseOrder {
   vendorName           String    @map("vendor_name")
   orderDate            DateTime  @map("order_date")
   expectedDeliveryDate DateTime  @map("expected_delivery_date")
-  createdAt            DateTime? @map("created_at")
-  updatedAt            DateTime? @map("updated_at")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime? @updatedAt @map("updated_at")
 
   lineItems PurchaseOrderLineItem[]
 
