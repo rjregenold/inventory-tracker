@@ -6,6 +6,7 @@ export class PurchaseOrderLineItemDto {
   parentName: string;
   name: string;
   quantity: number;
+  sku: string;
   unitCost: Decimal;
   lineCost: Decimal;
 }

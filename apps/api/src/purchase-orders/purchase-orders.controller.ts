@@ -1,5 +1,17 @@
-import {Controller, Get, NotFoundException, Param} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import {PurchaseOrdersService} from './purchase-orders.service';
+import {CreatePurchaseOrderDto} from './create-purchase-order-dto';
 
 @Controller('purchase-orders')
 export class PurchaseOrdersController {
@@ -17,5 +29,12 @@ export class PurchaseOrdersController {
       throw new NotFoundException();
     }
     return purchaseOrder;
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationPipe({transform: true}))
+  async create(@Body() dto: CreatePurchaseOrderDto) {
+    return await this.purchaseOrdersService.create(dto);
   }
 }

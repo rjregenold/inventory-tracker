@@ -1,9 +1,4 @@
-import {
-  Item,
-  Prisma,
-  PurchaseOrder,
-  PurchaseOrderLineItem,
-} from '@prisma/client';
+import {Prisma, PurchaseOrder, PurchaseOrderLineItem} from '@prisma/client';
 import {PurchaseOrderSummaryDto} from '../dto/purchase-order-summary.dto';
 import {PurchaseOrderCalculations} from '../utils/purchase-order-calculations';
 import {PurchaseOrderFullDto} from '../dto/purchase-order-full.dto';
@@ -54,6 +49,7 @@ export class PurchaseOrderMapper {
         id: lineItem.id,
         itemId: lineItem.itemId,
         name: lineItem.item.name,
+        sku: lineItem.item.sku,
         parentName: lineItem.item.parentItem.name,
         quantity: lineItem.quantity,
         unitCost: lineItem.unitCost,
