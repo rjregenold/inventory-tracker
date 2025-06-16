@@ -1,16 +1,15 @@
-import {getCookie, setCookie, deleteCookie} from 'cookies-next';
+import Cookies from 'js-cookie';
 
 export namespace CookieService {
   export function set(name: string, val: string) {
-    setCookie(name, val);
+    Cookies.set(name, val);
   }
 
   export function get(name: string): string | null {
-    const val = getCookie(name);
-    return val?.[0] ?? null;
+    return Cookies.get(name) ?? null;
   }
 
   export function remove(name: string) {
-    deleteCookie(name);
+    Cookies.remove(name);
   }
 }

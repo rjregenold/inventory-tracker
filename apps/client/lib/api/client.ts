@@ -1,3 +1,4 @@
+import {AuthService} from '../services/auth.service';
 import {Result} from '../types/result';
 
 export interface ApiError {
@@ -15,10 +16,15 @@ export class ApiError {
 export class ApiClient {
   private baseUrl: string;
   private defaultHeaders: HeadersInit;
+  private bearerToken: string | null = null;
 
   constructor(baseUrl: string, defaultHeaders: HeadersInit = {}) {
     this.baseUrl = baseUrl;
     this.defaultHeaders = defaultHeaders;
+  }
+
+  setBearerToken(token: string | null) {
+    this.bearerToken = token;
   }
 
   private async request<T>(
@@ -26,11 +32,15 @@ export class ApiClient {
     options: RequestInit = {},
   ): Promise<Result<T, ApiError>> {
     const url = `${this.baseUrl}${endpoint}`;
-    const config = {
+    const authHeader: HeadersInit = this.bearerToken
+      ? {Authorization: `Bearer ${this.bearerToken}`}
+      : {};
+    const config: RequestInit = {
       ...options,
       headers: {
         ...this.defaultHeaders,
         ...options.headers,
+        ...authHeader,
       },
     };
 

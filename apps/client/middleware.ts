@@ -1,15 +1,13 @@
 import {NextResponse} from 'next/server';
 import type {NextRequest} from 'next/server';
 import {AuthService} from './lib/services/auth.service';
-import {fromUnixTime, isPast} from 'date-fns';
+import {cookies} from 'next/headers';
+import {User} from './lib/auth/user';
 
-const signInRoute = '/auth/sign-in';
-const publicRoutes = [signInRoute, '/'];
+const publicRoutes = [AuthService.SIGN_IN_ROUTE, '/'];
 
 export function middleware(request: NextRequest) {
-  const token =
-    request.cookies.get(AuthService.USER_TOKEN_KEY)?.value ||
-    request.headers.get('authorization')?.replace('Bearer ', '');
+  const token = cookies().get(AuthService.USER_TOKEN_KEY)?.value;
 
   const {pathname} = request.nextUrl;
 
@@ -17,18 +15,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!token) {
-    return NextResponse.redirect(new URL(signInRoute, request.url));
+  if (!token || !User.isTokenActive(token)) {
+    return NextResponse.redirect(
+      new URL(AuthService.SIGN_IN_ROUTE, request.url),
+    );
   }
 
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    if (isPast(fromUnixTime(payload.exp))) {
-      return NextResponse.redirect(new URL(signInRoute, request.url));
-    }
-  } catch (error) {
-    return NextResponse.redirect(new URL(signInRoute, request.url));
-  }
+  AuthService.setAuthToken(token);
 
   return NextResponse.next();
 }

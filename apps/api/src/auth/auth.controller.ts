@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Put,
 } from '@nestjs/common';
 import {AuthService} from './auth.service';
 
@@ -37,5 +38,15 @@ export class AuthController {
       verificationToken.identifier,
       now,
     );
+  }
+
+  // we would never actually expose an endpoint like this in a real application,
+  // but we will use it to demonstrate different roles for this project.
+  @Put('role')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async assignRole(
+    @Body() {userId, roleName}: {userId: string; roleName: string},
+  ): Promise<void> {
+    await this.authService.assignRole(userId, roleName);
   }
 }

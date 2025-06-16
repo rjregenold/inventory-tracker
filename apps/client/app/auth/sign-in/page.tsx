@@ -40,11 +40,11 @@ export default function SignIn() {
           setLoading(false);
           return router.push('/purchase-orders');
         }
-
         setError('Sign in failed. Please try again.');
       },
       (err) => setError(ApiError.toString(err)),
     );
+
     setLoading(false);
   };
 

@@ -2,25 +2,14 @@
 
 import {createContext, useContext, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {fromUnixTime, isFuture} from 'date-fns';
 import {AuthService} from '@/lib/services/auth.service';
-
-interface User {
-  userId: string;
-  email: string;
-  roles: Array<{
-    name: string;
-    permissions: Array<{
-      action: string;
-      resource: string;
-    }>;
-  }>;
-}
+import {User} from '../auth/user';
 
 interface AuthContextType {
   user: User | null;
   signIn: (token: string) => void;
   signOut: () => void;
+  redirectSignIn: () => void;
   hasPermission: (action: string, resource: string) => boolean;
   isLoading: boolean;
 }
@@ -36,14 +25,9 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     const token = AuthService.getJwt();
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-
-        if (isFuture(fromUnixTime(payload.exp))) {
-          setUser({
-            userId: payload.userId,
-            email: payload.email,
-            roles: payload.roles,
-          });
+        if (User.isTokenActive(token)) {
+          setUser(User.fromToken(token));
+          AuthService.setAuthToken(token);
         } else {
           AuthService.clearJwt();
         }
@@ -56,18 +40,18 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
 
   const signIn = (token: string) => {
     AuthService.saveJwt(token);
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    setUser({
-      userId: payload.userId,
-      email: payload.email,
-      roles: payload.roles,
-    });
+    setUser(User.fromToken(token));
+    AuthService.setAuthToken(token);
   };
 
   const signOut = () => {
     AuthService.clearJwt();
     setUser(null);
     router.push('/');
+  };
+
+  const redirectSignIn = () => {
+    router.push(AuthService.SIGN_IN_ROUTE);
   };
 
   const hasPermission = (action: string, resource: string): boolean => {
@@ -83,7 +67,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
 
   return (
     <AuthContext.Provider
-      value={{user, signIn, signOut, hasPermission, isLoading}}
+      value={{user, signIn, signOut, redirectSignIn, hasPermission, isLoading}}
     >
       {children}
     </AuthContext.Provider>

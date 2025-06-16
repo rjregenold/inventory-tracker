@@ -3,9 +3,14 @@ export class PermissionDto {
   resource: string;
 }
 
+export class RoleDto {
+  name: string;
+  permissions: PermissionDto[];
+}
+
 export class UserDto {
   id: string;
   email: string;
   name: string;
-  permissions: PermissionDto[];
+  roles: RoleDto[];
 }

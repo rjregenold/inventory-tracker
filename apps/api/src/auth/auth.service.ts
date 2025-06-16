@@ -116,4 +116,16 @@ export class AuthService {
       await this.jwtService.signAsync(AuthMapper.toUserDto(user)),
     );
   }
+
+  // deletes all roles assigned to a user and assigns them the given role
+  async assignRole(userId: string, roleName: string) {
+    const role = await this.prisma.role.findUnique({where: {name: roleName}});
+    await this.prisma.userRole.deleteMany({where: {userId}});
+    await this.prisma.userRole.create({
+      data: {
+        userId,
+        roleId: role.id,
+      },
+    });
+  }
 }
